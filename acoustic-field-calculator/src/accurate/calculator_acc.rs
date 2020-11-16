@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,27 +12,24 @@
  */
 
 use super::traits::AccurateFieldBuffer;
-use crate::calculator::WaveSourceContainer;
-use crate::core::Float;
-use crate::observe_area::ObserveArea;
-use crate::wave_sources::WaveSource;
+use crate::{
+    core::container::WaveSourceContainer, observe_area::ObserveArea, wave_sources::WaveSource,
+};
 
 /// Accurate Calculator
-pub struct AccurateCalculator<S: WaveSource> {
-    sources: Vec<S>,
-    sound_speed: Float,
-}
+pub struct AccurateCalculator {}
 
-impl<S: WaveSource> AccurateCalculator<S> {
-    pub(crate) fn new(sound_speed: Float) -> Self {
-        Self {
-            sources: vec![],
-            sound_speed,
-        }
+impl Default for AccurateCalculator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl<S: WaveSource> AccurateCalculator<S> {
+impl AccurateCalculator {
+    pub fn new() -> Self {
+        Self {}
+    }
+
     /// Calculate field at observe area
     ///
     /// # Arguments
@@ -40,26 +37,13 @@ impl<S: WaveSource> AccurateCalculator<S> {
     /// * `observe_area` - Observed area to calculate
     /// * `field` - Field to calculate
     ///
-    pub fn calculate<'a, A: ObserveArea, D: Send, T: AccurateFieldBuffer<D>>(
-        &mut self,
+    pub fn calculate<'a, S: WaveSource, A: ObserveArea, D: Send, T: AccurateFieldBuffer<D>>(
+        &self,
+        container: &mut WaveSourceContainer<S>,
         observe_area: &A,
         field: &'a mut T,
     ) {
-        field.calculate_field(&self, observe_area);
-    }
-}
-
-impl<S: WaveSource> WaveSourceContainer<S> for AccurateCalculator<S> {
-    fn wave_sources(&self) -> &[S] {
-        &self.sources
-    }
-
-    fn wave_sources_mut(&mut self) -> &mut Vec<S> {
-        &mut self.sources
-    }
-
-    fn sound_speed(&self) -> Float {
-        self.sound_speed
+        field.calculate_field(container, observe_area);
     }
 }
 

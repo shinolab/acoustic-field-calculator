@@ -4,29 +4,32 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use super::calculator_acc::AccurateCalculator;
 use super::traits::*;
-use crate::core::Float;
-use crate::field_buffer::*;
-use crate::wave_sources::*;
-use crate::Complex;
-use crate::{calculator::WaveSourceContainer, field_buffer::PowerField};
-use crate::{observe_area::*, prelude::FieldBuffer};
+use crate::{
+    core::{container::WaveSourceContainer, Complex, Float},
+    field::*,
+    observe_area::*,
+    prelude::FieldBuffer,
+    wave_sources::*,
+};
 
-impl AccurateFieldBuffer<Float> for PressureField<Float> {
-    fn calculate_field<S, F>(&mut self, calculator: &AccurateCalculator<S>, observe_area: &F)
+impl AccurateFieldBuffer<Float> for PressureField {
+    fn calculate_field<S, F>(&mut self, container: &mut WaveSourceContainer<S>, observe_area: &F)
     where
         S: WaveSource,
         F: ObserveArea,
     {
-        let wave_sources = calculator.wave_sources();
+        for wave_source in container.wave_sources_mut() {
+            wave_source.set_sound_speed(self.sound_speed());
+        }
+        let wave_sources = container.wave_sources();
         calc_from_complex_pressure_accurate!(
             wave_sources,
             observe_area,
@@ -37,24 +40,30 @@ impl AccurateFieldBuffer<Float> for PressureField<Float> {
     }
 }
 
-impl AccurateFieldBuffer<Complex> for ComplexPressureField<Complex> {
-    fn calculate_field<S, F>(&mut self, calculator: &AccurateCalculator<S>, observe_area: &F)
+impl AccurateFieldBuffer<Complex> for ComplexPressureField {
+    fn calculate_field<S, F>(&mut self, container: &mut WaveSourceContainer<S>, observe_area: &F)
     where
         S: WaveSource,
         F: ObserveArea,
     {
-        let wave_sources = calculator.wave_sources();
+        for wave_source in container.wave_sources_mut() {
+            wave_source.set_sound_speed(self.sound_speed());
+        }
+        let wave_sources = container.wave_sources();
         calc_from_complex_pressure_accurate!(wave_sources, observe_area, c, c, self.buffer_mut());
     }
 }
 
-impl AccurateFieldBuffer<Float> for PowerField<Float> {
-    fn calculate_field<S, F>(&mut self, calculator: &AccurateCalculator<S>, observe_area: &F)
+impl AccurateFieldBuffer<Float> for PowerField {
+    fn calculate_field<S, F>(&mut self, container: &mut WaveSourceContainer<S>, observe_area: &F)
     where
         S: WaveSource,
         F: ObserveArea,
     {
-        let wave_sources = calculator.wave_sources();
+        for wave_source in container.wave_sources_mut() {
+            wave_source.set_sound_speed(self.sound_speed());
+        }
+        let wave_sources = container.wave_sources();
         calc_from_complex_pressure_accurate!(
             wave_sources,
             observe_area,

@@ -4,16 +4,14 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::core::wave_sources::WaveSource;
-use crate::core::Float;
-use crate::Vector3;
+use crate::core::{wave_sources::WaveSource, Float, Vector3};
 
 /// Gpu calculator requires directivity and attenuation coefficient.
 pub trait GpuWaveSource: WaveSource {

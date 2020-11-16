@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,9 +12,7 @@
  */
 
 use super::traits::*;
-use crate::core::wave_sources::T4010A1;
-use crate::core::Float;
-use crate::core::Vector3;
+use crate::core::{wave_sources::T4010A1, Float, Vector3};
 
 #[cfg(feature = "gpu")]
 impl GpuWaveSource for T4010A1 {

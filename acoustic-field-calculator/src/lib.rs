@@ -3,6 +3,13 @@ extern crate itertools;
 #[macro_use]
 extern crate lazy_static;
 extern crate nalgebra as na;
+#[macro_use]
+extern crate static_assertions;
+
+assert_cfg!(
+    not(all(feature = "gpu", feature = "double")),
+    "GPU backend cannot be used with double precision float."
+);
 
 #[cfg(feature = "accurate")]
 #[macro_use]
@@ -12,7 +19,7 @@ pub mod accurate;
 pub mod calculator;
 #[macro_use]
 mod core;
-pub mod field_buffer;
+pub mod field;
 #[cfg(feature = "gpu")]
 #[macro_use]
 /// gpu modules

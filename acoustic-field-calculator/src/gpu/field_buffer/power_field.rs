@@ -4,18 +4,20 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 use super::traits::*;
-use crate::field_buffer::PowerField;
-use crate::gpu::gpu_prelude::*;
-use crate::gpu::*;
-use crate::Vector3;
-use crate::{calculator::*, field_buffer::FieldBuffer};
+use crate::{
+    core::{container::WaveSourceContainer, Vector3},
+    field::{FieldBuffer, PowerField},
+    gpu::gpu_prelude::*,
+    gpu::*,
+    prelude::LinearUniformField,
+};
 
 use mut_static::MutStatic;
 
@@ -40,10 +42,10 @@ struct Config {
     _dummy3: u32,
 }
 
-impl GpuFieldBuffer for PowerField<f32> {
+impl GpuFieldBuffer for PowerField {
     fn calculate_field<S: GpuWaveSource, F: SizedArea>(
         &mut self,
-        calculator: &mut GpuCalculator<S>,
+        container: &mut WaveSourceContainer<S>,
         observe_area: &F,
         device: GpuDevice,
         queue: GpuQueue,
@@ -54,7 +56,11 @@ impl GpuFieldBuffer for PowerField<f32> {
             .unwrap()
             .update_cache(len, device.clone(), observe_area);
 
-        let sources = calculator.wave_sources();
+        for wave_source in container.wave_sources_mut() {
+            wave_source.set_sound_speed(self.sound_speed());
+        }
+
+        let sources = container.wave_sources();
         let directivity = S::directivity();
         let directivity_len = directivity.len();
         let (num_x, num_y, num_z) = observe_area.size();

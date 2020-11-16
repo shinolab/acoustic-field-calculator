@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 28/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,8 +12,7 @@
  */
 
 use super::traits::*;
-use crate::core::utils::calc_wavelength;
-use crate::core::{Complex, Float, Vector3, PI};
+use crate::core::{utils::calc_wavelength, Complex, Float, Vector3, PI};
 
 use num::Zero;
 

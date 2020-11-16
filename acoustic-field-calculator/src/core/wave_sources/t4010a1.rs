@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 28/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,9 +12,9 @@
  */
 
 use super::traits::*;
-use crate::core::attenuation::attenuation_coef;
-use crate::core::utils::calc_wavelength;
-use crate::core::{Complex, Float, Vector3, PI};
+use crate::core::{
+    attenuation::attenuation_coef, utils::calc_wavelength, Complex, Float, Vector3, PI,
+};
 
 use num::Zero;
 
@@ -161,6 +161,7 @@ impl WaveSource for T4010A1 {
         let phi = self.phase + self.wavenumber * dist;
         Complex::new(r * phi.cos(), r * phi.sin())
     }
+
     fn set_sound_speed(&mut self, c: Float) {
         self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
     }

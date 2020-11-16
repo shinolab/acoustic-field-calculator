@@ -4,18 +4,15 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use super::bounds::Bounds;
-use super::dimension::Axis;
-use super::*;
-use crate::core::Float;
-use crate::Vector3;
+use super::{bounds::Bounds, dimension::Axis, *};
+use crate::core::{Float, Vector3};
 
 use typenum::{N1, N2, N3};
 

@@ -4,7 +4,7 @@
  * Created Date: 27/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 26/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -61,9 +61,7 @@ fn main() {
     let z = 150.0;
     let focal_pos = array_center + z * Vector3::z();
 
-    let mut calculator = CalculatorBuilder::new()
-        .set_sound_speed(SOUND_SPEED)
-        .generate();
+    let mut calculator = CpuCalculator::new();
 
     let amp = 1.0;
     for y in 0..NUM_TRANS_Y {

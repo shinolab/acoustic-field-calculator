@@ -1,6 +1,6 @@
 [package]
 name = "acoustic-field-calculator"
-version = "0.5.5"
+version = "0.6.0"
 authors = ["suzuki_hapis <suzuki@hapis.k.u-tokyo.ac.jp>"]
 edition = "2018"
 
@@ -9,18 +9,19 @@ edition = "2018"
 [dependencies]
 num = "0.3"
 itertools = "0.9"
-nalgebra = "0.22"
+nalgebra = "0.23"
 lazy_static = "1"
 typenum = "1"
 
 ordered-float = {version = "2", optional = true}
-binary-heap-plus = {version = "0.3", optional = true}
+binary-heap-plus = {version = "0.4", optional = true}
 
 rayon = {version = "1", optional = true}
 
 vulkano = {version = "0.19", optional = true}
 vulkano-shaders = {version = "0.19" , optional = true}
 mut_static ={version = "5" , optional = true}
+static_assertions = "1"
 
 [dev-dependencies] 
 image = "0.23"

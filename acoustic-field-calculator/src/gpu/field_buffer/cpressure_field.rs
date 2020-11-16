@@ -4,22 +4,21 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 use super::traits::*;
-use crate::field_buffer::ComplexPressureField;
-use crate::gpu::gpu_prelude::*;
-use crate::gpu::*;
-use crate::Vector3;
-use crate::{calculator::*, field_buffer::FieldBuffer};
+use crate::{
+    core::{container::WaveSourceContainer, Vector3},
+    field::{ComplexPressureField, FieldBuffer},
+    gpu::gpu_prelude::*,
+    gpu::*,
+};
 
 use mut_static::MutStatic;
-
-type Complex = crate::na::Complex<f32>;
 
 mod cs_pressure {
     vulkano_shaders::shader! {
@@ -42,10 +41,10 @@ struct Config {
     _dummy3: u32,
 }
 
-impl GpuFieldBuffer for ComplexPressureField<Complex> {
+impl GpuFieldBuffer for ComplexPressureField {
     fn calculate_field<S: GpuWaveSource, F: SizedArea>(
         &mut self,
-        calculator: &mut GpuCalculator<S>,
+        container: &mut WaveSourceContainer<S>,
         observe_area: &F,
         device: GpuDevice,
         queue: GpuQueue,
@@ -56,7 +55,7 @@ impl GpuFieldBuffer for ComplexPressureField<Complex> {
             .unwrap()
             .update_cache(len, device.clone(), observe_area);
 
-        let sources = calculator.wave_sources();
+        let sources = container.wave_sources();
         let directivity = S::directivity();
         let directivity_len = directivity.len();
         let (num_x, num_y, num_z) = observe_area.size();

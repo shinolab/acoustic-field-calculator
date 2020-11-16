@@ -4,35 +4,32 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 01/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use super::traits::WaveSourceContainer;
-use crate::core::Float;
-use crate::field_buffer::FieldBufferCalculable;
-use crate::observe_area::ObserveArea;
-use crate::wave_sources::WaveSource;
+use crate::{
+    core::container::WaveSourceContainer, field::FieldCalculable, observe_area::ObserveArea,
+    wave_sources::WaveSource,
+};
 
 /// Normal Calculator
-pub struct CpuCalculator<S: WaveSource> {
-    sources: Vec<S>,
-    sound_speed: Float,
-}
+pub struct CpuCalculator {}
 
-impl<S: WaveSource> CpuCalculator<S> {
-    pub(crate) fn new(sound_speed: Float) -> Self {
-        Self {
-            sources: vec![],
-            sound_speed,
-        }
+impl Default for CpuCalculator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl<S: WaveSource> CpuCalculator<S> {
+impl CpuCalculator {
+    pub fn new() -> Self {
+        Self {}
+    }
+
     /// Calculate field at observe area
     ///
     /// # Arguments
@@ -40,26 +37,13 @@ impl<S: WaveSource> CpuCalculator<S> {
     /// * `observe_area` - Observed area to calculate
     /// * `field` - Field to calculate
     ///
-    pub fn calculate<'a, A: ObserveArea, T, F: FieldBufferCalculable<T>>(
-        &mut self,
+    pub fn calculate<'a, S: WaveSource, A: ObserveArea, T, F: FieldCalculable<T>>(
+        &self,
+        container: &mut WaveSourceContainer<S>,
         observe_area: &A,
         field: &'a mut F,
     ) {
-        field.calculate_field(&self, observe_area)
-    }
-}
-
-impl<S: WaveSource> WaveSourceContainer<S> for CpuCalculator<S> {
-    fn wave_sources(&self) -> &[S] {
-        &self.sources
-    }
-
-    fn wave_sources_mut(&mut self) -> &mut Vec<S> {
-        &mut self.sources
-    }
-
-    fn sound_speed(&self) -> Float {
-        self.sound_speed
+        field.calculate_field(container, observe_area)
     }
 }
 
