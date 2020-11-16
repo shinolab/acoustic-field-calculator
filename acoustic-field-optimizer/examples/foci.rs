@@ -200,7 +200,7 @@ fn main() {
     for source in calculator.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    APO::new(foci.clone(), amps.clone(), 2.0).optimize(calculator.wave_sources_mut());
+    APO::new(foci, amps, 2.0).optimize(calculator.wave_sources_mut());
     calculator.calculate(&area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());

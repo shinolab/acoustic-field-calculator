@@ -4,7 +4,7 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -89,8 +89,7 @@ impl GradientDescent {
     fn calc_Jtf(BhB: &MatrixXcf, T: &VectorXcf) -> VectorXf {
         let TTh = T * T.adjoint();
         let BhB_TTh = BhB.component_mul(&TTh);
-        let Jtf = BhB_TTh.map(|c| c.im).column_sum();
-        Jtf
+        BhB_TTh.map(|c| c.im).column_sum()
     }
 }
 

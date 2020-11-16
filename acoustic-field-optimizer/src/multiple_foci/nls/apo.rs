@@ -4,7 +4,7 @@
  * Created Date: 03/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -80,6 +80,7 @@ impl APO {
     // Does not consider Wolfe-Powell condition
     // Only search alpha in [0,1)
     #[allow(non_snake_case)]
+    #[allow(clippy::many_single_char_names)]
     fn line_search(
         q: &VectorXcf,
         d: &VectorXcf,
