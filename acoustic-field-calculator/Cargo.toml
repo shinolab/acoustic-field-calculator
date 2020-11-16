@@ -1,0 +1,37 @@
+[package]
+name = "acoustic-field-calculator"
+version = "0.5.5"
+authors = ["suzuki_hapis <suzuki@hapis.k.u-tokyo.ac.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num = "0.3"
+itertools = "0.9"
+nalgebra = "0.22"
+lazy_static = "1"
+typenum = "1"
+
+ordered-float = {version = "2", optional = true}
+binary-heap-plus = {version = "0.3", optional = true}
+
+rayon = {version = "1", optional = true}
+
+vulkano = {version = "0.19", optional = true}
+vulkano-shaders = {version = "0.19" , optional = true}
+mut_static ={version = "5" , optional = true}
+
+[dev-dependencies] 
+image = "0.23"
+float-cmp = "0.8"
+scarlet = "1"
+
+[features]
+accurate = ["ordered-float", "binary-heap-plus"]
+parallel = ["rayon"]
+gpu = ["vulkano", "vulkano-shaders", "mut_static"]
+fmath = []
+double = []
+all = ["gpu", "parallel", "fmath", "accurate"]
+default = ["parallel"]

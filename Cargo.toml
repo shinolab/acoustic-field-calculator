@@ -1,0 +1,10 @@
+[workspace]
+
+members = [
+    "acoustic-field-calculator",
+    "acoustic-field-optimizer",
+    "capi"
+]
+
+[profile.release]
+lto = true

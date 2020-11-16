@@ -1,0 +1,19 @@
+[package]
+name = "acoustic-field-optimizer"
+version = "0.5.5"
+authors = ["shun suzuki <suzuki@hapis.k.u-tokyo.ac.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+acoustic-field-calculator = {path="../acoustic-field-calculator"}
+num = "0.3"
+rand = "0.7"
+nalgebra = "0.22"
+image = "0.23"
+rustfft = "3.0.1"
+
+[dev-dependencies]
+scarlet = "1"
+walkdir = "2"

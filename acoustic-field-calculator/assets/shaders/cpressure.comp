@@ -1,0 +1,92 @@
+/*
+ * File: cpressure.comp
+ * Project: shaders
+ * Created Date: 11/05/2020
+ * Author: Shun Suzuki
+ * -----
+ * Last Modified: 02/10/2020
+ * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
+ * -----
+ * Copyright (c) 2020 Hapis Lab. All rights reserved.
+ * 
+ */
+
+#version 450
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+layout(set = 0, binding = 0) buffer Result {
+    float data[];
+} result;
+layout(set = 1, binding = 0)  buffer Config{
+    uint source_num;
+    uint num_x;
+    uint num_y;
+    uint num_z;
+    uint directivity_num;
+    uint _dummy1;
+    uint _dummy2;
+    uint _dummy3;
+} config;
+layout(set = 1, binding = 1) buffer Directivity {
+    float directivity[];
+} directivity;
+
+layout(set = 2, binding = 0) buffer SourcePos {
+    vec4 pos[];
+} source_pos;
+layout(set = 2, binding = 1) buffer SourceDir {
+    vec4 dir[];
+} source_dir;
+layout(set = 2, binding = 2) buffer SourceWavenum {
+    float wavenum[];
+} source_wavenum;
+layout(set = 2, binding = 3) buffer SourceAtten {
+    float atten[];
+} source_atten;
+layout(set = 3, binding = 0) buffer SourcePhase {
+    float phase[];
+} source_phase;
+layout(set = 3, binding = 1) buffer SourceAmp {
+    float amp[];
+} source_amp;
+layout(set = 4, binding = 0) buffer ObservePoints {
+    vec4 pos[];
+} observe_points;
+
+
+const float PI = 3.1415926535897932384626433832795;
+
+void main() {
+    uint ix = gl_GlobalInvocationID.x;
+    uint iy = gl_GlobalInvocationID.y;
+    uint iz = gl_GlobalInvocationID.z;
+    uint oi = ix + iy * config.num_x + iz * (config.num_x * config.num_y);
+    if (oi >= config.num_x * config.num_y * config.num_z) return; 
+
+    uint dir_max = config.directivity_num;
+    float re = 0.0;
+    float im = 0.0;
+    vec3 observe_point = vec3(observe_points.pos[oi]);
+    for(uint idx = 0; idx < 65536; idx++){
+        if (idx >= config.source_num) break;
+
+        vec3 tp = vec3(source_pos.pos[idx]);
+        vec3 rv = observe_point - tp;
+        float r = length(rv);
+
+        float wavenum = source_wavenum.wavenum[idx];
+        float p = source_phase.phase[idx] + wavenum*r;
+
+        float atten_coef = source_atten.atten[idx];
+        float attenuation = exp(-r * atten_coef);
+
+        vec3 z_dir = vec3(source_dir.dir[idx]);
+        uint theta_idx = uint(floor(acos(dot(z_dir, rv) / r) / PI * dir_max));
+        float d = directivity.directivity[theta_idx];
+        float amp = d * source_amp.amp[idx] * attenuation / r;
+
+        im += amp * cos(p);
+        re += amp * sin(p);
+    }
+    result.data[2*oi] = re;
+    result.data[2*oi] = im;
+}

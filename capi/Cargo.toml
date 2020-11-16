@@ -1,0 +1,19 @@
+[package]
+name = "capi"
+version = "0.5.5"
+authors = ["suzuki_hapis <suzuki@hapis.k.u-tokyo.ac.jp>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "afccapi"
+path = "src/lib.rs"
+crate-type = ["staticlib", "cdylib"]
+
+[dependencies]
+libc = "0.2"
+acoustic-field-calculator = {path="../acoustic-field-calculator", features = ["gpu", "parallel", "fmath", "accurate"]}
+acoustic-field-optimizer = {path="../acoustic-field-optimizer"}
+num-derive = "0.3"
+num-traits = "0.2"
