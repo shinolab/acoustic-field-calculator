@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["PI",""]],"mod":[["multiple_foci",""]],"struct":[["BesselBeam",""],["FocalPoint",""]],"trait":[["Optimizer",""],["WaveSource",""]],"type":[["Complex","Complex number"],["Float",""],["Vector3","Three-dimensional vector"]]});

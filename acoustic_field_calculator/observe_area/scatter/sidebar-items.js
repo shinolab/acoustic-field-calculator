@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ScatterArea","Scatter observation points"]]});

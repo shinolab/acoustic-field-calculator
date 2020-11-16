@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ComplexPressureField","Pressure field"],["PowerField","Power field"],["PressureField","Pressure field"]],"trait":[["FieldBuffer",""],["FieldBufferCalculable","Calculate field by normal calculator"],["ScalarFieldBuffer",""]]});

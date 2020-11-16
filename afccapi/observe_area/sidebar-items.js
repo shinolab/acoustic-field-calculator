@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["AFC_CreateGridArea1D",""],["AFC_CreateGridArea2D",""],["AFC_CreateGridArea3D",""],["AFC_CreateScatterArea",""],["AFC_FreeGridArea",""],["AFC_FreeScatterArea",""],["AFC_GetGridSize",""],["AFC_ScatterAddObservePoint",""]]});

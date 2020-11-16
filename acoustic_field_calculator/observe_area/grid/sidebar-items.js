@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Axis",""],["Dimension",""]],"struct":[["GridArea","Observation points on grid"],["GridAreaBuilder","Builder for GridArea"]],"type":[["N1",""],["N2",""],["N3",""]]});

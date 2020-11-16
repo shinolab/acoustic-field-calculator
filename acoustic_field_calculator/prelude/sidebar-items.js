@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["GridAreaBuilder","Builder for GridArea"],["SphereWaveSource","Wave source which emits a simple spherical wave"],["T4010A1","Ultrasound transducer T4010A1 model"]],"trait":[["WaveSource",""],["WaveSourceContainer",""]],"type":[["Complex","Complex number"],["Float",""],["Vector3","Three-dimensional vector"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["attenuation_coef","Returns an attenuation coefficients due to atmospheric absorption in a unit of [Np/mm]."]]});

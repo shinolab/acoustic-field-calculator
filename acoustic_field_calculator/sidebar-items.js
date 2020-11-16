@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["PI",""]],"mod":[["accurate","accurate mode"],["attenuation",""],["calculator",""],["field_buffer",""],["fmath",""],["gpu","gpu modules"],["observe_area",""],["prelude",""],["wave_sources",""],["wave_sources",""]],"type":[["Complex","Complex number"],["Float",""],["Vector3","Three-dimensional vector"]]});
