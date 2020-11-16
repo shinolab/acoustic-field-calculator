@@ -61,15 +61,14 @@ fn main() {
     let z = 150.0;
     let focal_pos = array_center + z * Vector3::z();
 
-    let mut calculator = CalculatorBuilder::new()
-        .set_sound_speed(SOUND_SPEED)
-        .generate();
+    let calculator = CpuCalculator::new();
 
     let amp = 1.0;
+    let mut container = WaveSourceContainer::new();
     for y in 0..NUM_TRANS_Y {
         for x in 0..NUM_TRANS_X {
             let pos = Vector3::new(TRANS_SIZE * x as Float, TRANS_SIZE * y as Float, 0.);
-            calculator.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, 0.0, FREQUENCY));
+            container.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, 0.0, FREQUENCY));
         }
     }
 
@@ -81,7 +80,11 @@ fn main() {
         .resolution(1.)
         .generate();
 
-    let mut field = PressureField::new();
+    let mut field = FieldBuilder::new()
+        .pressure()
+        .sound_speed(SOUND_SPEED)
+        .build();
+
     let foci = vec![
         focal_pos + Vector3::new(50., 0., 0.),
         focal_pos - Vector3::new(50., 0., 0.),
@@ -98,9 +101,17 @@ fn main() {
             let top_left = Vector3::new(0., TRANS_SIZE * (NUM_TRANS_Y - 1) as Float, 0.);
             let bottom_right = Vector3::new(TRANS_SIZE * (NUM_TRANS_X - 1) as Float, 0., 0.);
 
-            IFFT::new(path, bottom_left, top_left, bottom_right, TRANS_SIZE, z)
-                .optimize(calculator.wave_sources_mut());
-            calculator.calculate(&area, &mut field);
+            IFFT::new(
+                path,
+                bottom_left,
+                top_left,
+                bottom_right,
+                TRANS_SIZE,
+                z,
+                SOUND_SPEED,
+            )
+            .optimize(container.wave_sources_mut());
+            calculator.calculate(&mut container, &area, &mut field);
             let bounds = area.bounds();
             let bb = (bounds.x(), bounds.y());
             write_image!("xy_ifft.png", field, bb);
@@ -109,99 +120,101 @@ fn main() {
 
     ////////////////////////// Long et al. ///////////////////////////////
     // please specify maximum amplitude before
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    Long::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    Long::new(foci.clone(), amps.clone(), SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_long.png", field, bb);
 
     /////////////////////////////// HORN ///////////////////////////////
     // please specify maximum amplitude before
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    Horn::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    Horn::new(foci.clone(), amps.clone(), SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_horn.png", field, bb);
 
     /////////////////  Naive linear synthesis  /////////////////////////
     // please specify maximum amplitude before
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    Naive::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    Naive::new(foci.clone(), amps.clone(), SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_naive.png", field, bb);
 
     /////////////////  Gerchberg-Saxton  /////////////////////////
     // please specify maximum amplitude before
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    GS::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    GS::new(foci.clone(), amps.clone(), SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_gs.png", field, bb);
 
     /////////////////  GS-PAT  /////////////////////////
     // please specify maximum amplitude before
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    GSPAT::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    GSPAT::new(foci.clone(), amps.clone(), SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_gspat.png", field, bb);
 
     /////////////////  Gradient Descent  /////////////////////////
     // Gradient Descent optimizer currently does not support amplitudes
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    GradientDescent::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    GradientDescent::new(foci.clone(), amps.clone(), SOUND_SPEED)
+        .optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_gradient.png", field, bb);
 
     /////////////////  Gauss Newton  /////////////////////////
     // Gauss Newton optimizer currently does not support amplitudes
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    GaussNewton::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    GaussNewton::new(foci.clone(), amps.clone(), SOUND_SPEED)
+        .optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_gauss-newton.png", field, bb);
 
     /////////////////  Levenberg-Marquardt  /////////////////////////
     // Levenberg-Marquardt optimizer currently does not support amplitudes
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    LM::new(foci.clone(), amps.clone()).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    LM::new(foci.clone(), amps.clone(), SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_lm.png", field, bb);
 
     /////////////////  Acoustic Power Optimization  /////////////////////////
     // please specify maximum amplitude before
-    for source in calculator.wave_sources_mut().iter_mut() {
+    for source in container.wave_sources_mut().iter_mut() {
         source.set_amp(1.0);
     }
-    APO::new(foci, amps, 2.0).optimize(calculator.wave_sources_mut());
-    calculator.calculate(&area, &mut field);
+    APO::new(foci, amps, 2.0, SOUND_SPEED).optimize(container.wave_sources_mut());
+    calculator.calculate(&mut container, &area, &mut field);
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_apo.png", field, bb);

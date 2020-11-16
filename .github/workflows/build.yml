@@ -58,6 +58,6 @@ jobs:
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
     - name: lint
       run: |
-        cd acoustic-field-calculator && cargo clippy --all-targets --all-features -- -D warnings && cd ..
-        cd acoustic-field-optimizer && cargo clippy --all-targets --all-features -- -D warnings && cd ..
+        cd acoustic-field-calculator && cargo clippy --all-targets --features all -- -D warnings && cd ..
+        cd acoustic-field-optimizer && cargo clippy --all-targets -- -D warnings && cd ..
         cd capi && cargo clippy --all-targets -- -D warnings && cd ..

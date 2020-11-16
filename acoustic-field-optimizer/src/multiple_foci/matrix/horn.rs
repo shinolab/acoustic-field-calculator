@@ -4,7 +4,7 @@
  * Created Date: 27/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -32,18 +32,20 @@ pub struct Horn {
     repeat: usize,
     lambda: Float,
     tikhonov_parameter: Float,
+    sound_speed: Float,
 }
 
 /// Reference
 /// * Inoue, Seki, Yasutoshi Makino, and Hiroyuki Shinoda. "Active touch perception produced by airborne ultrasonic haptic hologram." 2015 IEEE World Haptics Conference (WHC). IEEE, 2015.
 impl Horn {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, sound_speed: Float) -> Self {
         Self {
             foci,
             amps,
             repeat: REPEAT_SDP,
             lambda: LAMBDA_SDP,
             tikhonov_parameter: TIKHONOV_DEFAULT,
+            sound_speed,
         }
     }
 
@@ -78,6 +80,7 @@ impl Optimizer for Horn {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let m = self.foci.len();

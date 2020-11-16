@@ -61,17 +61,18 @@ fn main() {
     let z = 150.0;
     let focal_pos = array_center + z * Vector3::z();
 
-    let mut calculator = CpuCalculator::new();
+    let calculator = CpuCalculator::new();
 
+    let mut container = WaveSourceContainer::new();
     let amp = 1.0;
     for y in 0..NUM_TRANS_Y {
         for x in 0..NUM_TRANS_X {
             let pos = Vector3::new(TRANS_SIZE * x as Float, TRANS_SIZE * y as Float, 0.);
-            calculator.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, 0.0, FREQUENCY));
+            container.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, 0.0, FREQUENCY));
         }
     }
 
-    FocalPoint::new(focal_pos).optimize(calculator.wave_sources_mut());
+    FocalPoint::new(focal_pos, SOUND_SPEED).optimize(container.wave_sources_mut());
 
     let r = 100.0;
     let area = GridAreaBuilder::new()
@@ -81,17 +82,20 @@ fn main() {
         .resolution(1.)
         .generate();
 
-    let mut field = PressureField::new();
+    let mut field = FieldBuilder::new()
+        .pressure()
+        .sound_speed(SOUND_SPEED)
+        .build();
 
-    calculator.calculate(&area, &mut field);
+    calculator.calculate(&mut container, &area, &mut field);
 
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
     write_image!("xy_focus.png", field, bb);
 
     /////////////////////////////// Bessel Beam ///////////////////////////////
-    BesselBeam::new(array_center, Vector3::z(), 18.0 / 180.0 * PI)
-        .optimize(calculator.wave_sources_mut());
+    BesselBeam::new(array_center, Vector3::z(), 18.0 / 180.0 * PI, SOUND_SPEED)
+        .optimize(container.wave_sources_mut());
 
     let buffer = GridAreaBuilder::new()
         .x_range(array_center[0] - r, array_center[0] + r)
@@ -100,7 +104,7 @@ fn main() {
         .resolution(1.)
         .generate();
 
-    calculator.calculate(&buffer, &mut field);
+    calculator.calculate(&mut container, &buffer, &mut field);
 
     let bounds = buffer.bounds();
     let bb = (bounds.x(), bounds.z());

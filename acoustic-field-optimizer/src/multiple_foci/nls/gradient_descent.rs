@@ -16,7 +16,7 @@ use crate::Optimizer;
 use crate::WaveSource;
 use crate::{Complex, Vector3};
 
-use na::{ComplexField, Dynamic, Matrix, VecStorage, U1};
+use na::{Dynamic, Matrix, VecStorage, U1};
 
 type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
 type VectorXcf = Matrix<Complex, Dynamic, U1, VecStorage<Complex, Dynamic, U1>>;
@@ -28,11 +28,16 @@ const K_MAX: usize = 10_000;
 pub struct GradientDescent {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
+    sound_speed: Float,
 }
 
 impl GradientDescent {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
-        Self { foci, amps }
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, sound_speed: Float) -> Self {
+        Self {
+            foci,
+            amps,
+            sound_speed,
+        }
     }
 }
 
@@ -98,6 +103,7 @@ impl Optimizer for GradientDescent {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let num_trans = wave_sources.len();

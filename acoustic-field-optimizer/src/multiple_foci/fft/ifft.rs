@@ -4,7 +4,7 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -29,6 +29,7 @@ pub struct IFFT {
     bottom_right: Vector3,
     spacing: Float,
     z: Float,
+    sound_speed: Float,
 }
 
 impl IFFT {
@@ -39,6 +40,7 @@ impl IFFT {
         bottom_right: Vector3,
         spacing: Float,
         z: Float,
+        sound_speed: Float,
     ) -> Self {
         Self {
             image_path: path.to_owned(),
@@ -47,6 +49,7 @@ impl IFFT {
             bottom_right,
             spacing,
             z,
+            sound_speed,
         }
     }
 }
@@ -112,6 +115,7 @@ impl Optimizer for IFFT {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let img = image::open(&self.image_path).unwrap();

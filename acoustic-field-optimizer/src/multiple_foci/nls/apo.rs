@@ -31,13 +31,19 @@ pub struct APO {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
     lambda: Float,
+    sound_speed: Float,
 }
 
 /// References
 /// * Keisuke Hasegawa, Hiroyuki Shinoda, and Takaaki Nara. Volumetric acoustic holography andits application to self-positioning by single channel measurement.Journal of Applied Physics,127(24):244904, 2020.7
 impl APO {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, lambda: Float) -> Self {
-        Self { foci, amps, lambda }
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, lambda: Float, sound_speed: Float) -> Self {
+        Self {
+            foci,
+            amps,
+            lambda,
+            sound_speed,
+        }
     }
 }
 
@@ -110,6 +116,7 @@ impl Optimizer for APO {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let num_trans = wave_sources.len();

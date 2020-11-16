@@ -4,7 +4,7 @@
  * Created Date: 03/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -24,11 +24,16 @@ type VectorXcf = Matrix<Complex, Dynamic, U1, VecStorage<Complex, Dynamic, U1>>;
 pub struct Naive {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
+    sound_speed: Float,
 }
 
 impl Naive {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
-        Self { foci, amps }
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, sound_speed: Float) -> Self {
+        Self {
+            foci,
+            amps,
+            sound_speed,
+        }
     }
 }
 
@@ -38,6 +43,7 @@ impl Optimizer for Naive {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let num_trans = wave_sources.len();

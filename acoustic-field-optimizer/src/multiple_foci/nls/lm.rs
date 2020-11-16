@@ -4,7 +4,7 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 26/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -16,7 +16,7 @@ use crate::Optimizer;
 use crate::WaveSource;
 use crate::{Complex, Vector3};
 
-use na::{ComplexField, Dynamic, Matrix, VecStorage, U1};
+use na::{Dynamic, Matrix, VecStorage, U1};
 
 type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
 type MatrixXf = Matrix<Float, Dynamic, Dynamic, VecStorage<Float, Dynamic, Dynamic>>;
@@ -31,6 +31,7 @@ const K_MAX: usize = 200;
 pub struct LM {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
+    sound_speed: Float,
 }
 
 /// References
@@ -38,8 +39,12 @@ pub struct LM {
 /// * D.W.Marquardt, “An algorithm for least-squares estimation of non-linear parameters,” Journal of the society for Industrial and AppliedMathematics, vol.11, no.2, pp.431–441, 1963.
 /// * K.Madsen, H.Nielsen, and O.Tingleff, “Methods for non-linear least squares problems (2nd ed.),” 2004.
 impl LM {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
-        Self { foci, amps }
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, sound_speed: Float) -> Self {
+        Self {
+            foci,
+            amps,
+            sound_speed,
+        }
     }
 }
 
@@ -113,6 +118,7 @@ impl Optimizer for LM {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let num_trans = wave_sources.len();

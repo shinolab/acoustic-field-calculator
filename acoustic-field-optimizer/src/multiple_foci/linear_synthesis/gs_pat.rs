@@ -4,7 +4,7 @@
  * Created Date: 01/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -25,6 +25,7 @@ const REPEAT: usize = 100;
 pub struct GSPAT {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
+    sound_speed: Float,
 }
 
 /// Reference
@@ -32,8 +33,12 @@ pub struct GSPAT {
 ///
 /// Not yet been implemented with GPU.
 impl GSPAT {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
-        Self { foci, amps }
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, sound_speed: Float) -> Self {
+        Self {
+            foci,
+            amps,
+            sound_speed,
+        }
     }
 }
 
@@ -43,6 +48,7 @@ impl Optimizer for GSPAT {
     fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
         for source in wave_sources.iter_mut() {
             source.set_phase(0.);
+            source.set_sound_speed(self.sound_speed);
         }
 
         let num_trans = wave_sources.len();

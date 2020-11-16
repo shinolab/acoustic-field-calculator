@@ -4,28 +4,30 @@
  * Created Date: 05/06/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 28/09/2020
+ * Last Modified: 16/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::Optimizer;
-use crate::Vector3;
-use crate::WaveSource;
-
-use crate::{Float, PI};
+use crate::{Float, Optimizer, Vector3, WaveSource, PI};
 
 pub struct BesselBeam {
     point: Vector3,
     dir: Vector3,
     theta: Float,
+    sound_speed: Float,
 }
 
 impl BesselBeam {
-    pub fn new(point: Vector3, dir: Vector3, theta: Float) -> Self {
-        Self { point, dir, theta }
+    pub fn new(point: Vector3, dir: Vector3, theta: Float, sound_speed: Float) -> Self {
+        Self {
+            point,
+            dir,
+            theta,
+            sound_speed,
+        }
     }
 }
 
@@ -36,6 +38,8 @@ impl Optimizer for BesselBeam {
         let v = Vector3::new(dir[1], -dir[0], 0.);
         let theta_w = v.norm().asin();
         for source in sound_source {
+            source.set_sound_speed(self.sound_speed);
+
             let pos = source.position();
 
             let r = pos - point;

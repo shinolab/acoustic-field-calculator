@@ -10,9 +10,9 @@ edition = "2018"
 acoustic-field-calculator = {path="../acoustic-field-calculator"}
 num = "0.3"
 rand = "0.7"
-nalgebra = "0.22"
+nalgebra = "0.23"
 image = "0.23"
-rustfft = "3"
+rustfft = "4"
 
 [dev-dependencies]
 scarlet = "1"
