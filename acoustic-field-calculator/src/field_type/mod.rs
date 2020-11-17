@@ -4,20 +4,18 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-mod builder;
 mod complex_pressure_field;
 mod power_field;
 mod pressure_field;
 mod traits;
 
-pub use builder::FieldBuilder;
 pub use complex_pressure_field::ComplexPressureField;
 pub use power_field::PowerField;
 pub use pressure_field::PressureField;

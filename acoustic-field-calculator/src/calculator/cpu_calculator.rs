@@ -12,7 +12,7 @@
  */
 
 use crate::{
-    core::container::WaveSourceContainer, field::FieldCalculable, observe_area::ObserveArea,
+    core::container::WaveSourceContainer, field_type::FieldCalculable, observe_area::ObserveArea,
     wave_sources::WaveSource,
 };
 
@@ -37,40 +37,52 @@ impl CpuCalculator {
     /// * `observe_area` - Observed area to calculate
     /// * `field` - Field to calculate
     ///
-    pub fn calculate<'a, S: WaveSource, A: ObserveArea, T, F: FieldCalculable<T>>(
+    pub fn calculate<'a, S: WaveSource, F: FieldCalculable, A: ObserveArea<F>>(
         &self,
         container: &mut WaveSourceContainer<S>,
-        observe_area: &A,
-        field: &'a mut F,
+        observe_area: &mut A,
     ) {
-        field.calculate_field(container, observe_area.observe_points())
+        F::calculate_field(container, observe_area)
     }
 }
 
+macro_rules! propagate {
+    ($obs_p: ident, $source: ident, $st: ty) => {{
+        let diff = crate::fmath::sub($obs_p, $source.position());
+        let dist = diff.norm();
+        let theta = crate::fmath::acos($source.direction().dot(&diff) / dist);
+        let d = <$st>::directivity(theta);
+        let r = $source.amp() * d / dist;
+        let phi = $source.phase() + $source.wavenumber() * dist;
+        Complex::new(r * phi.cos(), r * phi.sin())
+    }};
+}
+
 macro_rules! calc_from_complex_pressure {
-    ($wave_sources: ident, $buffer: ident, $val: ident, $f: expr, $results: expr) => {
+    ($wave_sources: ident, $st: ty, $obs: ident, $val: ident, $f: expr) => {
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};
-            $buffer
-                .observe_points()
+            let (obs_points, results) = $obs.points_and_results_buf();
+            obs_points
                 .par_iter()
                 .map(|&observe_point| {
                     let $val: Complex = $wave_sources
                         .iter()
-                        .map(|source| source.propagate(observe_point))
+                        .map(|source| propagate!(observe_point, source, $st))
                         .sum();
                     $f
                 })
-                .collect_into_vec($results);
+                .collect_into_vec(results);
         }
         #[cfg(not(feature = "parallel"))]
         {
-            $results.resize($buffer.observe_points().len(), Default::default());
-            for (result, &observe_point) in $results.iter_mut().zip($buffer.observe_points()) {
+            let (obs_points, results) = $obs.points_and_results_buf();
+            results.resize(obs_points.len(), Default::default());
+            for (result, &observe_point) in results.iter_mut().zip(obs_points) {
                 let $val: Complex = $wave_sources
                     .iter()
-                    .map(|source| source.propagate(observe_point))
+                    .map(|source| propagate!(observe_point, source, $st))
                     .sum();
                 *result = $f;
             }

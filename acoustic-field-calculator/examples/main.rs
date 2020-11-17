@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -21,7 +21,7 @@ const SOUND_SPEED: Float = 340e3;
 const WAVE_LENGTH: Float = SOUND_SPEED / FREQUENCY;
 
 macro_rules! write_image {
-    ($filename: tt, $field: ident, $bb: ident) => {{
+    ($filename: tt, $area: ident, $bb: ident) => {{
         use image::png::PngEncoder;
         use image::ColorType;
         use scarlet::colormap::ListedColorMap;
@@ -30,9 +30,9 @@ macro_rules! write_image {
         let colormap = ListedColorMap::magma();
 
         let output = File::create($filename).unwrap();
-        let max = $field.max() as Float;
-        let pixels: Vec<_> = $field
-            .buffer()
+        let max = $area.max_result() as Float;
+        let pixels: Vec<_> = $area
+            .results()
             .chunks_exact($bb.0)
             .rev()
             .flatten()
@@ -81,20 +81,17 @@ fn main() {
     }
 
     let r = 100.0;
-    let area = GridAreaBuilder::new()
+    let mut area = ObserveAreaBuilder::new()
+        .grid()
         .x_range(array_center[0] - r / 2.0, array_center[0] + r / 2.0)
         .y_range(array_center[1] - r / 2.0, array_center[1] + r / 2.0)
         .z_at(z)
         .resolution(1.)
+        .pressure()
         .generate();
 
-    let mut field = FieldBuilder::new()
-        .pressure()
-        .sound_speed(SOUND_SPEED)
-        .build();
-
     let start = std::time::Instant::now();
-    calculator.calculate(&mut container, &area, &mut field);
+    calculator.calculate(&mut container, &mut area);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
@@ -102,7 +99,8 @@ fn main() {
 
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("xy.png", field, bb);
+
+    write_image!("xy.png", area, bb);
 
     /////////////////////////////////////////////////////////////////////
     let focal_pos = focal_pos + Vector3::new(20., 20., 0.);
@@ -114,7 +112,7 @@ fn main() {
     }
 
     let start = std::time::Instant::now();
-    calculator.calculate(&mut container, &area, &mut field);
+    calculator.calculate(&mut container, &mut area);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
@@ -122,5 +120,5 @@ fn main() {
 
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("xy2.png", field, bb);
+    write_image!("xy2.png", area, bb);
 }

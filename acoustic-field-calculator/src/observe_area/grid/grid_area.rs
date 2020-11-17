@@ -4,7 +4,7 @@
  * Created Date: 05/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -14,34 +14,37 @@
 use super::{
     bounds::Bounds,
     dimension::{Axis, Dimension},
+    *,
 };
 use crate::{
-    core::{Float, Vector3},
+    core::{Complex, Float, Vector3},
+    field_type::*,
+    na::ComplexField,
     observe_area::traits::*,
 };
-
-pub use typenum::{N1, N2, N3};
 
 use std::marker::PhantomData;
 
 /// Observation points on grid
-pub struct GridArea<D> {
+pub struct GridArea<D, F: FieldType> {
     dimension: Dimension,
     bounds: Bounds,
     observe_points: Vec<Vector3>,
+    results: Vec<F::Output>,
     _dim_num: PhantomData<D>,
 }
 
-impl<D> GridArea<D> {
+impl<D, F: FieldType> GridArea<D, F> {
     fn new_impl<N>(
         dimension: Dimension,
         bounds: Bounds,
         observe_points: Vec<Vector3>,
-    ) -> GridArea<N> {
-        GridArea::<N> {
+    ) -> GridArea<N, F> {
+        GridArea {
             dimension,
             bounds,
             observe_points,
+            results: vec![],
             _dim_num: PhantomData,
         }
     }
@@ -57,7 +60,7 @@ impl<D> GridArea<D> {
     }
 }
 
-impl GridArea<N1> {
+impl<F: FieldType> GridArea<N1, F> {
     pub(crate) fn new(axis: Axis, bounds: Bounds, origin: Vector3, resolution: Float) -> Self {
         Self::new_impl(
             Dimension::One(axis),
@@ -89,7 +92,7 @@ impl GridArea<N1> {
     }
 }
 
-impl GridArea<N2> {
+impl<F: FieldType> GridArea<N2, F> {
     pub(crate) fn new(
         dim: (Axis, Axis),
         bounds: Bounds,
@@ -164,7 +167,7 @@ impl GridArea<N2> {
     }
 }
 
-impl GridArea<N3> {
+impl<F: FieldType> GridArea<N3, F> {
     pub(crate) fn new(
         dim: (Axis, Axis, Axis),
         bounds: Bounds,
@@ -229,8 +232,33 @@ impl GridArea<N3> {
     }
 }
 
-impl<D> ObserveArea for GridArea<D> {
-    fn observe_points(&self) -> &Vec<Vector3> {
-        &self.observe_points
+impl<D, F: FieldType> ObserveArea<F> for GridArea<D, F> {
+    fn points_and_results_buf(&mut self) -> (&Vec<Vector3>, &mut Vec<F::Output>) {
+        (&self.observe_points, &mut self.results)
+    }
+
+    fn results(&self) -> &[F::Output] {
+        &self.results
+    }
+}
+
+impl<D, F: FieldType<Output = Float>> ScalarFieldBuffer<Float> for GridArea<D, F> {
+    fn max_result(&self) -> Float {
+        self.results().iter().fold(Float::NAN, |m, v| v.max(m))
+    }
+}
+
+impl<D, F: FieldType<Output = Complex>> ScalarFieldBuffer<Complex> for GridArea<D, F> {
+    fn max_result(&self) -> Complex {
+        self.results.iter().fold(
+            Complex::new(Float::NAN, Float::NAN),
+            |m, &v| -> na::Complex<f32> {
+                if v.abs() < m.abs() {
+                    m
+                } else {
+                    v
+                }
+            },
+        )
     }
 }

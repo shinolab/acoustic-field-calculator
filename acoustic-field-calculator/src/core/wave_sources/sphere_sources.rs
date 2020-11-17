@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,7 +12,7 @@
  */
 
 use super::traits::*;
-use crate::core::{utils::calc_wavelength, Complex, Float, Vector3, PI};
+use crate::core::{utils::calc_wavelength, Float, Vector3, PI};
 
 use num::Zero;
 
@@ -48,12 +48,9 @@ impl SphereWaveSource {
 }
 
 impl WaveSource for SphereWaveSource {
-    fn propagate(&self, x: Vector3) -> Complex {
-        let diff = self.pos - x;
-        let dist = diff.norm();
-        let phase = self.phase + self.wavenumber * dist;
-        let r = self.amp / dist;
-        Complex::new(r * phase.cos(), r * phase.sin())
+    #[inline(always)]
+    fn directivity(_theta: Float) -> Float {
+        1.0
     }
     fn set_sound_speed(&mut self, c: Float) {
         self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
@@ -62,6 +59,11 @@ impl WaveSource for SphereWaveSource {
     impl_getset!((get = position, set = set_position, field = pos), Vector3);
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);
+
+    fn direction(&self) -> Vector3 {
+        Vector3::zero()
+    }
+    fn set_direction(&mut self, _value: Vector3) {}
 }
 
 impl std::default::Default for SphereWaveSource {

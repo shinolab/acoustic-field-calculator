@@ -1,7 +1,5 @@
 #[macro_use]
 extern crate itertools;
-#[macro_use]
-extern crate lazy_static;
 extern crate nalgebra as na;
 #[macro_use]
 extern crate static_assertions;
@@ -13,17 +11,17 @@ assert_cfg!(
 
 #[cfg(feature = "accurate")]
 #[macro_use]
-/// accurate mode
+// accurate mode
 pub mod accurate;
 #[macro_use]
 pub mod calculator;
 #[macro_use]
 mod core;
-pub mod field;
 #[cfg(feature = "gpu")]
 #[macro_use]
-/// gpu modules
+// gpu modules
 pub mod gpu;
+pub mod field_type;
 
 pub mod fmath;
 pub mod observe_area;
