@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -13,7 +13,7 @@
 
 use super::traits::*;
 use crate::{
-    core::{container::WaveSourceContainer, Complex, Float},
+    core::{container::WaveSourceContainer, Complex, Float, Vector3},
     na::ComplexField,
     observe_area::*,
     wave_sources::*,
@@ -50,16 +50,16 @@ impl FieldBuffer<Complex> for ComplexPressureField {
 }
 
 impl FieldCalculable<Complex> for ComplexPressureField {
-    fn calculate_field<S, F>(&mut self, container: &mut WaveSourceContainer<S>, observe_area: &F)
-    where
-        S: WaveSource,
-        F: ObserveArea,
-    {
+    fn calculate_field<S: WaveSource>(
+        &mut self,
+        container: &mut WaveSourceContainer<S>,
+        obs_points: &Vec<Vector3>,
+    ) {
         for wave_source in container.wave_sources_mut() {
             wave_source.set_sound_speed(self.sound_speed);
         }
         let wave_sources = container.wave_sources();
-        calc_from_complex_pressure!(wave_sources, observe_area, c, c, &mut self.results);
+        calc_from_complex_pressure!(wave_sources, obs_points, c, c, &mut self.results);
     }
 }
 

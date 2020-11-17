@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -12,8 +12,7 @@
  */
 
 use crate::{
-    core::{container::WaveSourceContainer, Float},
-    observe_area::*,
+    core::{container::WaveSourceContainer, Float, Vector3},
     wave_sources::*,
 };
 
@@ -28,10 +27,10 @@ pub trait FieldBuffer<D> {
 
 /// Calculate field by normal calculator
 pub trait FieldCalculable<D>: FieldBuffer<D> {
-    fn calculate_field<S: WaveSource, F: ObserveArea>(
+    fn calculate_field<S: WaveSource>(
         &mut self,
         container: &mut WaveSourceContainer<S>,
-        field_buffer: &F,
+        obs_positions: &Vec<Vector3>,
     );
 }
 

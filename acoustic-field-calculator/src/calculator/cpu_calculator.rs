@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 17/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -43,7 +43,7 @@ impl CpuCalculator {
         observe_area: &A,
         field: &'a mut F,
     ) {
-        field.calculate_field(container, observe_area)
+        field.calculate_field(container, observe_area.observe_points())
     }
 }
 
