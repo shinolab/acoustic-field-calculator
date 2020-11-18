@@ -64,7 +64,7 @@ impl_sync!(
     ///
     /// * `theta` - angle
     fn directivity(theta: Float) -> Float;,
-    getset!((getter = frequency, setter = set_frequency), Float);,
+    getset!((getter = frequency), Float);,
     getset!((getter = position, setter = set_position), Vector3);,
     getset!((getter = direction, setter = set_direction), Vector3);,
     getset!((getter = phase, setter = set_phase), Float);,

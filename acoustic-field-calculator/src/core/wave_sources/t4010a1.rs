@@ -119,10 +119,7 @@ impl WaveSource for T4010A1 {
         }
     }
 
-    impl_getset!(
-        (get = frequency, set = set_frequency, field = frequency),
-        Float
-    );
+    impl_getset!((get = frequency, field = frequency), Float);
     impl_getset!((get = position, set = set_position, field = pos), Vector3);
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);

@@ -16,6 +16,7 @@ use crate::core::{
     attenuation::attenuation_coef, sound_speed::calc_sound_speed, wave_sources::*, Complex, Float,
     Vector3, PI,
 };
+use num::Zero;
 
 pub struct UniformSystem<S: WaveSource> {
     wave_sources: Vec<S>,
@@ -84,19 +85,20 @@ impl<S: WaveSource> WaveSourceContainer<S> for UniformSystem<S> {
 
 impl<S: WaveSource> PropagationMedium for UniformSystem<S> {
     fn propagate(&self, target: Vector3) -> Complex {
-        self.wave_sources
-            .iter()
-            .zip(self.wavenums.iter())
-            .zip(self.attens.iter())
-            .map(|((source, &wavenum), &atten)| {
-                let diff = crate::fmath::sub(target, source.position());
-                let dist = diff.norm();
-                let theta = crate::fmath::acos(source.direction().dot(&diff) / dist);
-                let d = S::directivity(theta);
-                let r = source.amp() * d * (-dist * atten).exp() / dist;
-                let phi = source.phase() + wavenum * dist;
-                Complex::from_polar(r, phi)
-            })
-            .sum()
+        let sources = self.wave_sources();
+        let wavenums = self.wavenums();
+        let attens = self.attens();
+        let mut c = Complex::zero();
+        for i in 0..sources.len() {
+            let source = &sources[i];
+            let diff = crate::fmath::sub(target, source.position());
+            let dist = diff.norm();
+            let theta = crate::fmath::acos(source.direction().dot(&diff) / dist);
+            let d = S::directivity(theta);
+            let r = source.amp() * d * (-dist * attens[i]).exp() / dist;
+            let phi = source.phase() + wavenums[i] * dist;
+            c += Complex::from_polar(r, phi);
+        }
+        c
     }
 }

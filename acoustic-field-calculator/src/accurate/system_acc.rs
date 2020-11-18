@@ -27,21 +27,22 @@ impl<S: WaveSource> AccPropagationMedium for UniformSystem<S> {
     fn propagate(&self, target: Vector3) -> Complex {
         let mut re_heap = BinaryHeap::new_min();
         let mut im_heap = BinaryHeap::new_min();
-        let wave_sources = self.wave_sources();
-        re_heap.reserve(wave_sources.len());
-        im_heap.reserve(wave_sources.len());
 
-        for ((source, &wavenum), &atten) in wave_sources
-            .iter()
-            .zip(self.wavenums().iter())
-            .zip(self.attens().iter())
-        {
+        let sources = self.wave_sources();
+        let wavenums = self.wavenums();
+        let attens = self.attens();
+
+        re_heap.reserve(sources.len());
+        im_heap.reserve(sources.len());
+
+        for i in 0..sources.len() {
+            let source = &sources[i];
             let diff = crate::fmath::sub(target, source.position());
             let dist = diff.norm();
             let theta = crate::fmath::acos(source.direction().dot(&diff) / dist);
             let d = S::directivity(theta);
-            let r = source.amp() * d * (-dist * atten).exp() / dist;
-            let phi = source.phase() + wavenum * dist;
+            let r = source.amp() * d * (-dist * attens[i]).exp() / dist;
+            let phi = source.phase() + wavenums[i] * dist;
             re_heap.push(OrderedFloat(r * phi.cos()));
             im_heap.push(OrderedFloat(r * phi.sin()));
         }
