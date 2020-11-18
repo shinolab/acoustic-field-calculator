@@ -1,17 +1,18 @@
 /*
- * File: pressure.comp
- * Project: shaders
- * Created Date: 11/05/2020
+ * File: mod.rs
+ * Project: system
+ * Created Date: 18/11/2020
  * Author: Shun Suzuki
  * -----
  * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
- * 
+ *
  */
 
-#version 450
-#include "cpressure_base.comp"
+mod traits;
+mod uniform_medium;
 
-MAIN_FROM_COMPLEX_VALUE(result.data[oi] = sqrt(re*re+im*im);)
+pub use traits::*;
+pub use uniform_medium::UniformSystem;

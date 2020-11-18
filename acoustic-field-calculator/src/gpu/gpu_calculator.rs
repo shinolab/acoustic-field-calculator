@@ -4,14 +4,16 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::{container::WaveSourceContainer, gpu::gpu_prelude::*, gpu::*};
+use crate::{
+    core::wave_sources::WaveSource, gpu::gpu_prelude::*, gpu::*, system::WaveSourceContainer,
+};
 
 /// GPU Calculator
 pub struct GpuCalculator {
@@ -38,15 +40,21 @@ impl GpuCalculator {
     /// * `observe_area` - Observed area to calculate
     /// * `field` - Field to calculate
     ///
-    pub fn calculate<S: GpuWaveSource, A: SizedArea, T: GpuFieldBuffer>(
+    pub fn calculate<
+        'a,
+        S: WaveSource,
+        M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
+        T,
+        F: GpuFieldType<T>,
+        A: SizedArea<T, F>,
+    >(
         &self,
-        container: &mut WaveSourceContainer<S>,
-        observe_area: &A,
-        field: &mut T,
+        medium: &'a M,
+        observe_area: &'a mut A,
     ) {
         let device = self.device.clone();
         let queue = self.queue.clone();
-        field.calculate_field(container, observe_area, device, queue);
+        F::calculate_field(medium, observe_area, device, queue);
     }
 
     fn init_gpu() -> (Arc<Device>, Arc<Queue>) {

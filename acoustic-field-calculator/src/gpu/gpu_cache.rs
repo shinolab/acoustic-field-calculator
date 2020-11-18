@@ -4,7 +4,7 @@
  * Created Date: 20/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -13,6 +13,7 @@
 
 macro_rules! gen_cache {
     ($shader_mod: ident) => {
+        use once_cell::sync::Lazy;
         use std::sync::atomic::{AtomicPtr, Ordering};
 
         struct GpuCache {
@@ -23,14 +24,11 @@ macro_rules! gen_cache {
             pub obs_points_buf: Option<GpuBuffer<[f32; 4]>>,
         }
 
-        lazy_static! {
-            static ref GPU_CACHE: MutStatic<GpuCache> = {
-                let cache = MutStatic::new();
-
-                cache.set(GpuCache::new()).unwrap();
-                cache
-            };
-        }
+        static GPU_CACHE: Lazy<MutStatic<GpuCache>> = Lazy::new(|| {
+            let cache = MutStatic::new();
+            cache.set(GpuCache::new()).unwrap();
+            cache
+        });
 
         impl GpuCache {
             pub fn new() -> Self {
@@ -43,11 +41,11 @@ macro_rules! gen_cache {
                 }
             }
 
-            pub fn update_cache<F: SizedArea>(
+            pub fn update_cache<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
                 &mut self,
                 len: usize,
                 device: GpuDevice,
-                observe_area: &F,
+                observe_area: &A,
             ) {
                 if self.device.is_none() {
                     self.initialize_cache(len, device.clone(), observe_area);
@@ -62,23 +60,28 @@ macro_rules! gen_cache {
                 }
             }
 
-            fn initialize_cache<F: SizedArea>(
+            fn initialize_cache<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
                 &mut self,
                 len: usize,
                 device: GpuDevice,
-                observe_area: &F,
+                observe_area: &A,
             ) {
                 self.init_pipeline(device.clone());
                 self.init_observe_area(observe_area, len, device.clone());
                 self.device = Some(device);
             }
 
-            fn update<F: SizedArea>(&mut self, len: usize, device: GpuDevice, observe_area: &F) {
-                let observe_points = observe_area.observe_points();
+            fn update<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
+                &mut self,
+                len: usize,
+                device: GpuDevice,
+                observe_area: &A,
+            ) {
+                let obs_points = observe_area.points();
                 let (current_obs_p, current_obs_len) = &self.obs_points;
                 let current_obs_p = current_obs_p.load(Ordering::Acquire);
-                if (*current_obs_len != observe_points.len())
-                    || !std::ptr::eq(current_obs_p, observe_points.as_ptr())
+                if (*current_obs_len != obs_points.len())
+                    || !std::ptr::eq(current_obs_p, obs_points.as_ptr())
                 {
                     self.init_observe_area(observe_area, len, device);
                 }
@@ -97,13 +100,13 @@ macro_rules! gen_cache {
                 self.pipeline = Some(pipeline);
             }
 
-            fn init_observe_area<F: SizedArea>(
+            fn init_observe_area<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
                 &mut self,
-                observe_area: &F,
+                observe_area: &A,
                 len: usize,
                 device: GpuDevice,
             ) {
-                let obs_points = observe_area.observe_points();
+                let obs_points = observe_area.points();
                 let res_buffer = {
                     let data_iter = (0..len).map(|_| f32::default());
                     CpuAccessibleBuffer::from_iter(
