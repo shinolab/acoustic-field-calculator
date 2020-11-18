@@ -15,14 +15,14 @@ use crate::{Float, Vector3};
 
 macro_rules! impl_sync {
     ($name: ident, $( $def: item ),* ) => {
-        #[cfg(feature = "parallel")]
+        // #[cfg(feature = "parallel")]
         pub trait $name: Sync{
             $( $def )*
         }
-        #[cfg(not(feature = "parallel"))]
-        pub trait $name{
-            $( $def )*
-        }
+        // #[cfg(not(feature = "parallel"))]
+        // pub trait $name{
+        //     $( $def )*
+        // }
     };
 }
 

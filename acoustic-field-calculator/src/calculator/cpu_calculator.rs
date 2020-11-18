@@ -37,7 +37,7 @@ impl CpuCalculator {
     pub fn calculate<
         'a,
         M: PropagationMedium,
-        O: Send,
+        O: Send + Sized + Default + Clone,
         F: FieldType<Output = O>,
         A: ObserveArea<F>,
     >(
@@ -62,7 +62,7 @@ impl CpuCalculator {
             results.resize(obs_points.len(), Default::default());
             for (result, &observe_point) in results.iter_mut().zip(obs_points) {
                 let cp = medium.propagate(observe_point);
-                result = F::calc_from_complex_pressure(cp);
+                *result = F::calc_from_complex_pressure(cp);
             }
         }
     }

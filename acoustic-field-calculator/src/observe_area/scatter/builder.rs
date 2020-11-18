@@ -4,7 +4,7 @@
  * Created Date: 17/11/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -26,6 +26,12 @@ impl<F> ScatterAreaBuilder<F> {
         Self {
             field_type: PhantomData,
         }
+    }
+}
+
+impl<F> Default for ScatterAreaBuilder<F> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

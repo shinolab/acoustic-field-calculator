@@ -63,9 +63,3 @@ impl WaveSource for SphereWaveSource {
     }
     fn set_direction(&mut self, _value: Vector3) {}
 }
-
-impl std::default::Default for SphereWaveSource {
-    fn default() -> Self {
-        Self::new(Vector3::zero(), 1., 0., 40e3)
-    }
-}

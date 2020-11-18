@@ -14,8 +14,6 @@
 use super::traits::*;
 use crate::core::{Float, Vector3, PI};
 
-use num::Zero;
-
 #[allow(clippy::excessive_precision, clippy::unreadable_literal)]
 static DIR_COEF_A: [Float; 10] = [
     0.,
@@ -105,6 +103,7 @@ impl T4010A1 {
 }
 
 impl WaveSource for T4010A1 {
+    #[allow(clippy::many_single_char_names)]
     fn directivity(theta: Float) -> Float {
         match (theta / ANGLE_DIV).ceil() as usize {
             0 => 1.0,
@@ -115,8 +114,7 @@ impl WaveSource for T4010A1 {
                 let c = DIR_COEF_C[i];
                 let d = DIR_COEF_D[i];
                 let x = theta - (i as Float - 1.0) * ANGLE_DIV;
-                let res = a + (b + ((c + d * x) * x)) * x;
-                res
+                a + (b + ((c + d * x) * x)) * x
             }
         }
     }
@@ -129,10 +127,4 @@ impl WaveSource for T4010A1 {
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);
     impl_getset!((get = direction, set = set_direction, field = dir), Vector3);
-}
-
-impl std::default::Default for T4010A1 {
-    fn default() -> Self {
-        Self::new(Vector3::zero(), Vector3::z(), 1., 0., 40e3)
-    }
 }

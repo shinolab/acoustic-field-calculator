@@ -4,7 +4,7 @@
  * Created Date: 17/11/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -58,5 +58,11 @@ impl<A> ObserveAreaBuilder<A, Empty> {
 
     pub fn complex_pressure(self) -> ObserveAreaBuilder<A, ComplexPressureField> {
         unsafe { transmute(self) }
+    }
+}
+
+impl<F> Default for ObserveAreaBuilder<Empty, F> {
+    fn default() -> Self {
+        Self::new()
     }
 }
