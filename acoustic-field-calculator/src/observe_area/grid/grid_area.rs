@@ -4,7 +4,7 @@
  * Created Date: 05/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -17,9 +17,8 @@ use super::{
     *,
 };
 use crate::{
-    core::{Complex, Float, Vector3},
+    core::{Float, Vector3},
     field_type::*,
-    na::ComplexField,
     observe_area::traits::*,
 };
 
@@ -239,26 +238,5 @@ impl<D, F: FieldType> ObserveArea<F> for GridArea<D, F> {
 
     fn results(&self) -> &[F::Output] {
         &self.results
-    }
-}
-
-impl<D, F: FieldType<Output = Float>> ScalarFieldBuffer<Float> for GridArea<D, F> {
-    fn max_result(&self) -> Float {
-        self.results().iter().fold(Float::NAN, |m, v| v.max(m))
-    }
-}
-
-impl<D, F: FieldType<Output = Complex>> ScalarFieldBuffer<Complex> for GridArea<D, F> {
-    fn max_result(&self) -> Complex {
-        self.results.iter().fold(
-            Complex::new(Float::NAN, Float::NAN),
-            |m, &v| -> na::Complex<f32> {
-                if v.abs() < m.abs() {
-                    m
-                } else {
-                    v
-                }
-            },
-        )
     }
 }

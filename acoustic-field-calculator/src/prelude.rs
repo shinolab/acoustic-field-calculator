@@ -11,10 +11,10 @@
  *
  */
 
-// #[cfg(feature = "accurate")]
-// pub use crate::accurate::*;
-// #[cfg(feature = "gpu")]
-// pub use crate::gpu::*;
+#[cfg(feature = "accurate")]
+pub use crate::accurate::*;
+#[cfg(feature = "gpu")]
+pub use crate::gpu::*;
 pub use crate::{
     calculator::CpuCalculator,
     core::{wave_sources::*, Complex, Float, Vector3, PI},

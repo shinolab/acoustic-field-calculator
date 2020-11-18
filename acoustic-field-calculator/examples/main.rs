@@ -51,9 +51,9 @@ macro_rules! write_image {
 
 // #[cfg(feature = "gpu")]
 // type Calculator = GpuCalculator;
-// #[cfg(all(not(feature = "gpu"), feature = "accurate"))]
-// type Calculator = AccurateCalculator;
-// #[cfg(all(not(feature = "gpu"), not(feature = "accurate")))]
+#[cfg(all(not(feature = "gpu"), feature = "accurate"))]
+type Calculator = AccurateCalculator;
+#[cfg(all(not(feature = "gpu"), not(feature = "accurate")))]
 type Calculator = CpuCalculator;
 
 fn main() {

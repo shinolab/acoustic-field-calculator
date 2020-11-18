@@ -55,6 +55,14 @@ impl<S: WaveSource> UniformSystem<S> {
         self.wavenums.push(wavenum);
         self.attens.push(atten);
     }
+
+    pub fn wavenums(&self) -> &Vec<Float> {
+        &self.wavenums
+    }
+
+    pub fn attens(&self) -> &Vec<Float> {
+        &self.attens
+    }
 }
 
 impl<S: WaveSource> WaveSourceContainer<S> for UniformSystem<S> {
