@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -64,8 +64,8 @@ impl_sync!(
     ///
     /// * `theta` - angle
     fn directivity(theta: Float) -> Float;,
-    getset!((setter = set_sound_speed), Float);,
-    getset!((getter = wavenumber), Float);,
+    getset!((setter = frequency), Float);,
+    // getset!((getter = wavenumber), Float);,
     getset!((getter = position, setter = set_position), Vector3);,
     getset!((getter = direction, setter = set_direction), Vector3);,
     getset!((getter = phase, setter = set_phase), Float);,

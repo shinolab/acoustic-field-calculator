@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -81,8 +81,8 @@ pub struct T4010A1 {
     pub amp: Float,
     pub phase: Float,
     pub frequency: Float,
-    pub atten_coef: Float,
-    wavenumber: Float,
+    // pub atten_coef: Float,
+    // wavenumber: Float,
 }
 
 impl T4010A1 {
@@ -102,19 +102,19 @@ impl T4010A1 {
             amp,
             phase,
             frequency,
-            wavenumber: 0.,
-            atten_coef: attenuation_coef(frequency, 30., 1., 1., 293.15, 293.15, 273.16),
+            // wavenumber: 0.,
+            // atten_coef: attenuation_coef(frequency, 30., 1., 1., 293.15, 293.15, 273.16),
         }
     }
 
-    /// Set an attenuation coefficient
-    ///
-    /// # Arguments
-    ///
-    /// * `atten` - Attenuation coefficient
-    pub fn set_attenuation(&mut self, atten: Float) {
-        self.atten_coef = atten;
-    }
+    // /// Set an attenuation coefficient
+    // ///
+    // /// # Arguments
+    // ///
+    // /// * `atten` - Attenuation coefficient
+    // pub fn set_attenuation(&mut self, atten: Float) {
+    //     self.atten_coef = atten;
+    // }
 }
 
 impl WaveSource for T4010A1 {
@@ -134,11 +134,11 @@ impl WaveSource for T4010A1 {
         }
     }
 
-    fn set_sound_speed(&mut self, c: Float) {
-        self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
-    }
-
-    impl_getset!((get = wavenumber, field = wavenumber), Float);
+    // fn set_sound_speed(&mut self, c: Float) {
+    //     self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
+    // }
+    // impl_getset!((get = wavenumber, field = wavenumber), Float);
+    impl_getset!((get = frequency, field = frequency), Float);
     impl_getset!((get = position, set = set_position, field = pos), Vector3);
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);

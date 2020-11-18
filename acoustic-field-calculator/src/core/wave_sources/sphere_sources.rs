@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -24,7 +24,7 @@ pub struct SphereWaveSource {
     amp: Float,
     phase: Float,
     frequency: Float,
-    wavenumber: Float,
+    // wavenumber: Float,
 }
 
 impl SphereWaveSource {
@@ -42,7 +42,7 @@ impl SphereWaveSource {
             amp,
             phase,
             frequency,
-            wavenumber: 0.,
+            // wavenumber: 0.,
         }
     }
 }
@@ -52,10 +52,10 @@ impl WaveSource for SphereWaveSource {
     fn directivity(_theta: Float) -> Float {
         1.0
     }
-    fn set_sound_speed(&mut self, c: Float) {
-        self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
-    }
-    impl_getset!((get = wavenumber, field = wavenumber), Float);
+    // fn set_sound_speed(&mut self, c: Float) {
+    //     self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
+    // }
+    impl_getset!((get = frequency, field = frequency), Float);
     impl_getset!((get = position, set = set_position, field = pos), Vector3);
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);

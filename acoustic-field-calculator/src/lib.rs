@@ -9,21 +9,23 @@ assert_cfg!(
     "GPU backend cannot be used with double precision float."
 );
 
-#[cfg(feature = "accurate")]
-#[macro_use]
-// accurate mode
-pub mod accurate;
 #[macro_use]
 pub mod calculator;
 #[macro_use]
 mod core;
+
+#[cfg(feature = "accurate")]
+#[macro_use]
+// accurate mode
+pub mod accurate;
 #[cfg(feature = "gpu")]
 #[macro_use]
 // gpu modules
 pub mod gpu;
-pub mod field_type;
 
+pub mod field_type;
 pub mod fmath;
+pub mod medium;
 pub mod observe_area;
 pub mod prelude;
 
