@@ -20,7 +20,9 @@ use crate::{
 
 pub trait ObserveArea<F: FieldType> {
     /// Returns all observation points
-    fn points_and_results_buf(&mut self) -> (&Vec<Vector3>, &mut Vec<F::Output>);
+    fn points_and_results_mut(&mut self) -> (&Vec<Vector3>, &mut Vec<F::Output>);
+    fn results_mut(&mut self) -> &mut Vec<F::Output>;
+    fn points(&self) -> &[Vector3];
     fn results(&self) -> &[F::Output];
 }
 
@@ -51,15 +53,14 @@ where
     T: ObserveArea<ComplexPressureField>,
 {
     fn max_result(&self) -> Complex {
-        self.results().iter().fold(
-            Complex::new(Float::NAN, Float::NAN),
-            |m, &v| -> na::Complex<f32> {
+        self.results()
+            .iter()
+            .fold(Complex::new(Float::NAN, Float::NAN), |m, &v| -> Complex {
                 if v.abs() < m.abs() {
                     m
                 } else {
                     v
                 }
-            },
-        )
+            })
     }
 }

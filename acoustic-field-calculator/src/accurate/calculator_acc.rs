@@ -39,7 +39,7 @@ impl AccurateCalculator {
         medium: &'a M,
         observe_area: &'a mut A,
     ) {
-        let (obs_points, results) = observe_area.points_and_results_buf();
+        let (obs_points, results) = observe_area.points_and_results_mut();
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};

@@ -15,10 +15,9 @@ use acoustic_field_calculator::prelude::*;
 
 const NUM_TRANS_X: usize = 18;
 const NUM_TRANS_Y: usize = 14;
-const TRANS_SIZE: Float = 10.18;
-const FREQUENCY: Float = 40e3;
-const SOUND_SPEED: Float = 340e3;
-const WAVE_LENGTH: Float = SOUND_SPEED / FREQUENCY;
+const TRANS_SIZE: Float = 10.18; // mm
+const FREQUENCY: Float = 40e3; // Hz
+const TEMPERATURE: Float = 300.0; // K
 
 macro_rules! write_image {
     ($filename: tt, $area: ident, $bb: ident) => {{
@@ -49,8 +48,8 @@ macro_rules! write_image {
     }};
 }
 
-// #[cfg(feature = "gpu")]
-// type Calculator = GpuCalculator;
+#[cfg(feature = "gpu")]
+type Calculator = GpuCalculator;
 #[cfg(all(not(feature = "gpu"), feature = "accurate"))]
 type Calculator = AccurateCalculator;
 #[cfg(all(not(feature = "gpu"), not(feature = "accurate")))]
@@ -62,24 +61,30 @@ fn main() {
         TRANS_SIZE * (NUM_TRANS_Y - 1) as Float / 2.0,
         0.,
     );
-
     let z = 150.0;
     let focal_pos = array_center + z * Vector3::z();
 
-    let calculator = Calculator::new();
+    // UniformSystem is a uniform medium of sound
+    let mut system = UniformSystem::new(TEMPERATURE);
+    println!("{}", system.info());
 
-    let mut system = UniformSystem::new(300.0);
+    // Placing sound sources which produce focus at 'focal_pos'
+    let sound_speed = system.sound_speed();
     let amp = 1.0;
+    let dir = Vector3::z();
     for y in 0..NUM_TRANS_Y {
         for x in 0..NUM_TRANS_X {
             let pos = Vector3::new(TRANS_SIZE * x as Float, TRANS_SIZE * y as Float, 0.);
             let d = (pos - focal_pos).norm();
-            let phase = (d % WAVE_LENGTH) / WAVE_LENGTH;
+            let wavelength = sound_speed / FREQUENCY;
+            let phase = (d % wavelength) / wavelength;
             let phase = -2.0 * PI * phase;
-            system.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, phase, FREQUENCY));
+            system.add_wave_source(T4010A1::new(pos, dir, amp, phase, FREQUENCY));
         }
     }
+    println!("{}", system.info_of_source(0));
 
+    // Generating observe range and type
     let r = 100.0;
     let mut area = ObserveAreaBuilder::new()
         .grid()
@@ -90,6 +95,8 @@ fn main() {
         .pressure()
         .generate();
 
+    // Calculation
+    let calculator = Calculator::new();
     let start = std::time::Instant::now();
     calculator.calculate(&system, &mut area);
     println!(
@@ -97,18 +104,19 @@ fn main() {
         start.elapsed().as_micros() as f64 / 1000.0
     );
 
+    // Print to png image
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-
     write_image!("xy.png", area, bb);
 
-    /////////////////////////////////////////////////////////////////////
+    ////////////////////// Moving focus ///////////////////////////////
     let focal_pos = focal_pos + Vector3::new(20., 20., 0.);
-    for source in system.wave_sources_mut() {
-        let d = (source.position() - focal_pos).norm();
-        let phase = (d % WAVE_LENGTH) / WAVE_LENGTH;
+    for wave_source in system.wave_sources_mut() {
+        let d = (wave_source.position() - focal_pos).norm();
+        let wavelength = sound_speed / FREQUENCY;
+        let phase = (d % wavelength) / wavelength;
         let phase = -2.0 * PI * phase;
-        source.set_phase(phase);
+        wave_source.set_phase(phase);
     }
 
     let start = std::time::Instant::now();

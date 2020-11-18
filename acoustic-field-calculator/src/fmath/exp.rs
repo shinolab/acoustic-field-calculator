@@ -4,7 +4,7 @@
  * Created Date: 22/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 26/09/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -16,6 +16,7 @@ use crate::core::Float;
 #[cfg(all(feature = "fmath", not(feature = "accurate")))]
 mod fmath {
     use crate::core::Float;
+    use once_cell::sync::Lazy;
 
     const EXP_TABLE_SIZE_BIT: usize = 10;
     const EXP_TABLE_SIZE: usize = 1 << EXP_TABLE_SIZE_BIT;
@@ -53,19 +54,17 @@ mod fmath {
         u: UINT,
     }
 
-    lazy_static! {
-        static ref EXP_FRAC_TABLE: [UINT; EXP_TABLE_SIZE] = {
-            let mut exp_frac: [UINT; EXP_TABLE_SIZE] = [0; EXP_TABLE_SIZE];
-            for (i, r) in exp_frac.iter_mut().enumerate() {
-                let y = float {
-                    f: (2.0 as Float).powf(i as Float / EXP_TABLE_SIZE as Float),
-                };
-                let bit = unsafe { y.u };
-                *r = bit & mask(FRACTION_BIT_SIZE);
-            }
-            exp_frac
-        };
-    }
+    static EXP_FRAC_TABLE: Lazy<[UINT; EXP_TABLE_SIZE]> = Lazy::new(|| {
+        let mut exp_frac: [UINT; EXP_TABLE_SIZE] = [0; EXP_TABLE_SIZE];
+        for (i, r) in exp_frac.iter_mut().enumerate() {
+            let y = float {
+                f: (2.0 as Float).powf(i as Float / EXP_TABLE_SIZE as Float),
+            };
+            let bit = unsafe { y.u };
+            *r = bit & mask(FRACTION_BIT_SIZE);
+        }
+        exp_frac
+    });
 
     const LN2: Float = 0.69314718056;
     const ALPHA: Float = (1 << EXP_TABLE_SIZE_BIT) as Float / LN2;

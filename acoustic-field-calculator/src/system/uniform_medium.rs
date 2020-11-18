@@ -23,6 +23,7 @@ pub struct UniformSystem<S: WaveSource> {
     wavenums: Vec<Float>,
     attens: Vec<Float>,
     temperature: Float,
+    sound_speed: Float,
 }
 
 impl<S: WaveSource> UniformSystem<S> {
@@ -32,6 +33,7 @@ impl<S: WaveSource> UniformSystem<S> {
             wavenums: vec![],
             attens: vec![],
             temperature,
+            sound_speed: calc_sound_speed(temperature),
         }
     }
 
@@ -41,8 +43,7 @@ impl<S: WaveSource> UniformSystem<S> {
     }
 
     pub fn add_wave_source_with_atten(&mut self, source: S, atten: Float) {
-        let sound_speed = calc_sound_speed(self.temperature);
-        let wavenum = 2.0 * PI * source.frequency() / sound_speed;
+        let wavenum = 2.0 * PI * source.frequency() / self.sound_speed;
         self.add_wave_source_with_wavenum_and_atten(source, wavenum, atten);
     }
 
@@ -57,12 +58,35 @@ impl<S: WaveSource> UniformSystem<S> {
         self.attens.push(atten);
     }
 
-    pub fn wavenums(&self) -> &Vec<Float> {
+    pub fn wavenums(&self) -> &[Float] {
         &self.wavenums
     }
 
-    pub fn attens(&self) -> &Vec<Float> {
+    pub fn attens(&self) -> &[Float] {
         &self.attens
+    }
+
+    pub fn sound_speed(&self) -> Float {
+        self.sound_speed
+    }
+
+    pub fn info(&self) -> String {
+        format!(
+            "Uniform Medium:\n Temperature: {} K = {} ℃\n Sound Speed: {} mm/s",
+            self.temperature,
+            self.temperature - 273.15,
+            calc_sound_speed(self.temperature)
+        )
+    }
+
+    pub fn info_of_source(&self, idx: usize) -> String {
+        format!(
+            "{}-th wave source:\n Wavelength: {} mm\n Wavenumber: {} mm^-1\n Attenuation: {} Np/mm",
+            idx,
+            2.0 * PI / self.wavenums[idx],
+            self.wavenums[idx],
+            self.attens[idx]
+        )
     }
 }
 

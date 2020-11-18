@@ -38,11 +38,19 @@ impl<F: FieldType> ScatterArea<F> {
 }
 
 impl<F: FieldType> ObserveArea<F> for ScatterArea<F> {
-    fn points_and_results_buf(&mut self) -> (&Vec<Vector3>, &mut Vec<F::Output>) {
+    fn points_and_results_mut(&mut self) -> (&Vec<Vector3>, &mut Vec<F::Output>) {
         (&self.observe_points, &mut self.results)
     }
 
     fn results(&self) -> &[F::Output] {
         &self.results
+    }
+
+    fn points(&self) -> &[Vector3] {
+        &self.observe_points
+    }
+
+    fn results_mut(&mut self) -> &mut Vec<F::Output> {
+        &mut self.results
     }
 }

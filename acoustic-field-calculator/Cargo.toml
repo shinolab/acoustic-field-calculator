@@ -18,6 +18,7 @@ vulkano = {version = "0.19", optional = true}
 vulkano-shaders = {version = "0.19" , optional = true}
 mut_static ={version = "5" , optional = true}
 static_assertions = "1"
+once_cell = "1"
 
 [dev-dependencies] 
 image = "0.23"
