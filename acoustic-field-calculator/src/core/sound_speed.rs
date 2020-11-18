@@ -1,6 +1,6 @@
 /*
- * File: mod.rs
- * Project: medium
+ * File: sound_speed.rs
+ * Project: core
  * Created Date: 18/11/2020
  * Author: Shun Suzuki
  * -----
@@ -11,5 +11,8 @@
  *
  */
 
-mod traits;
-mod uniform_medium;
+use crate::core::Float;
+
+pub fn calc_sound_speed(t: Float) -> Float {
+    331.3 * (t / 273.15).sqrt() * 1000.0
+}

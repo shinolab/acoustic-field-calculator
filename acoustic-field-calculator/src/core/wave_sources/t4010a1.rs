@@ -12,7 +12,7 @@
  */
 
 use super::traits::*;
-use crate::core::{attenuation::attenuation_coef, utils::calc_wavelength, Float, Vector3, PI};
+use crate::core::{Float, Vector3, PI};
 
 use num::Zero;
 
@@ -76,11 +76,11 @@ const ANGLE_DIV: Float = PI / 18.0;
 #[repr(C)]
 /// Ultrasound transducer [T4010A1](https://www.nicera.co.jp/products/ultrasonic-sensor/open-aperture-type) model
 pub struct T4010A1 {
-    pub pos: Vector3,
-    pub dir: Vector3,
-    pub amp: Float,
-    pub phase: Float,
-    pub frequency: Float,
+    pos: Vector3,
+    dir: Vector3,
+    amp: Float,
+    phase: Float,
+    frequency: Float,
     // pub atten_coef: Float,
     // wavenumber: Float,
 }
@@ -138,7 +138,10 @@ impl WaveSource for T4010A1 {
     //     self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
     // }
     // impl_getset!((get = wavenumber, field = wavenumber), Float);
-    impl_getset!((get = frequency, field = frequency), Float);
+    impl_getset!(
+        (get = frequency, set = set_frequency, field = frequency),
+        Float
+    );
     impl_getset!((get = position, set = set_position, field = pos), Vector3);
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);

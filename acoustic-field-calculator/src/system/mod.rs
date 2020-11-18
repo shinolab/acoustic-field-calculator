@@ -1,6 +1,6 @@
 /*
- * File: traits.rs
- * Project: medium
+ * File: mod.rs
+ * Project: system
  * Created Date: 18/11/2020
  * Author: Shun Suzuki
  * -----
@@ -11,9 +11,8 @@
  *
  */
 
-use crate::core::wave_sources::WaveSource;
-use crate::core::{Complex, Vector3};
+mod traits;
+mod uniform_medium;
 
-pub trait Medium {
-    fn propagate<S: WaveSource>(&self, source: &S, target: Vector3) -> Complex;
-}
+pub use traits::*;
+pub use uniform_medium::UniformSystem;

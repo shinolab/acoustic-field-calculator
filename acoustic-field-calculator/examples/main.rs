@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -49,11 +49,11 @@ macro_rules! write_image {
     }};
 }
 
-#[cfg(feature = "gpu")]
-type Calculator = GpuCalculator;
-#[cfg(all(not(feature = "gpu"), feature = "accurate"))]
-type Calculator = AccurateCalculator;
-#[cfg(all(not(feature = "gpu"), not(feature = "accurate")))]
+// #[cfg(feature = "gpu")]
+// type Calculator = GpuCalculator;
+// #[cfg(all(not(feature = "gpu"), feature = "accurate"))]
+// type Calculator = AccurateCalculator;
+// #[cfg(all(not(feature = "gpu"), not(feature = "accurate")))]
 type Calculator = CpuCalculator;
 
 fn main() {
@@ -68,7 +68,7 @@ fn main() {
 
     let calculator = Calculator::new();
 
-    let mut container = WaveSourceContainer::new();
+    let mut system = UniformSystem::new(300.0);
     let amp = 1.0;
     for y in 0..NUM_TRANS_Y {
         for x in 0..NUM_TRANS_X {
@@ -76,7 +76,7 @@ fn main() {
             let d = (pos - focal_pos).norm();
             let phase = (d % WAVE_LENGTH) / WAVE_LENGTH;
             let phase = -2.0 * PI * phase;
-            container.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, phase, FREQUENCY));
+            system.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, phase, FREQUENCY));
         }
     }
 
@@ -91,7 +91,7 @@ fn main() {
         .generate();
 
     let start = std::time::Instant::now();
-    calculator.calculate(&mut container, &mut area);
+    calculator.calculate(&system, &mut area);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
@@ -104,15 +104,15 @@ fn main() {
 
     /////////////////////////////////////////////////////////////////////
     let focal_pos = focal_pos + Vector3::new(20., 20., 0.);
-    for source in container.wave_sources_mut() {
-        let d = (source.pos - focal_pos).norm();
+    for source in system.wave_sources_mut() {
+        let d = (source.position() - focal_pos).norm();
         let phase = (d % WAVE_LENGTH) / WAVE_LENGTH;
         let phase = -2.0 * PI * phase;
-        source.phase = phase;
+        source.set_phase(phase);
     }
 
     let start = std::time::Instant::now();
-    calculator.calculate(&mut container, &mut area);
+    calculator.calculate(&system, &mut area);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0

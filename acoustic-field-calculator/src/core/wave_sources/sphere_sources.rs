@@ -55,7 +55,10 @@ impl WaveSource for SphereWaveSource {
     // fn set_sound_speed(&mut self, c: Float) {
     //     self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
     // }
-    impl_getset!((get = frequency, field = frequency), Float);
+    impl_getset!(
+        (get = frequency, set = set_frequency, field = frequency),
+        Float
+    );
     impl_getset!((get = position, set = set_position, field = pos), Vector3);
     impl_getset!((get = phase, set = set_phase, field = phase), Float);
     impl_getset!((get = amp, set = set_amp, field = amp), Float);
