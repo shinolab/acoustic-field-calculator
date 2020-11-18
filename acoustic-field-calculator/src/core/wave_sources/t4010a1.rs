@@ -81,8 +81,6 @@ pub struct T4010A1 {
     amp: Float,
     phase: Float,
     frequency: Float,
-    // pub atten_coef: Float,
-    // wavenumber: Float,
 }
 
 impl T4010A1 {
@@ -102,19 +100,8 @@ impl T4010A1 {
             amp,
             phase,
             frequency,
-            // wavenumber: 0.,
-            // atten_coef: attenuation_coef(frequency, 30., 1., 1., 293.15, 293.15, 273.16),
         }
     }
-
-    // /// Set an attenuation coefficient
-    // ///
-    // /// # Arguments
-    // ///
-    // /// * `atten` - Attenuation coefficient
-    // pub fn set_attenuation(&mut self, atten: Float) {
-    //     self.atten_coef = atten;
-    // }
 }
 
 impl WaveSource for T4010A1 {
@@ -134,10 +121,6 @@ impl WaveSource for T4010A1 {
         }
     }
 
-    // fn set_sound_speed(&mut self, c: Float) {
-    //     self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
-    // }
-    // impl_getset!((get = wavenumber, field = wavenumber), Float);
     impl_getset!(
         (get = frequency, set = set_frequency, field = frequency),
         Float

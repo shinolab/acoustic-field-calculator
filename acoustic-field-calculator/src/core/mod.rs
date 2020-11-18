@@ -13,7 +13,6 @@
 
 pub mod attenuation;
 pub mod sound_speed;
-mod utils;
 #[macro_use]
 pub mod wave_sources;
 

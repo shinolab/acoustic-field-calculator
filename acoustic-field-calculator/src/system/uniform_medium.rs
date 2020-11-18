@@ -17,40 +17,14 @@ use crate::core::{
     Vector3, PI,
 };
 
-pub trait UniformWaveSource: WaveSource {
-    fn propagate(&self, target: Vector3, wavenum: Float, atten: Float) -> Complex;
-}
-
-impl UniformWaveSource for SphereWaveSource {
-    fn propagate(&self, target: Vector3, wavenum: Float, atten: Float) -> Complex {
-        let diff = crate::fmath::sub(target, self.position());
-        let dist = diff.norm();
-        let r = self.amp() * (-dist * atten).exp() / dist;
-        let phi = self.phase() + wavenum * dist;
-        Complex::from_polar(r, phi)
-    }
-}
-
-impl UniformWaveSource for T4010A1 {
-    fn propagate(&self, target: Vector3, wavenum: Float, atten: Float) -> Complex {
-        let diff = crate::fmath::sub(target, self.position());
-        let dist = diff.norm();
-        let theta = crate::fmath::acos(self.direction().dot(&diff) / dist);
-        let d = T4010A1::directivity(theta);
-        let r = self.amp() * d * (-dist * atten).exp() / dist;
-        let phi = self.phase() + wavenum * dist;
-        Complex::from_polar(r, phi)
-    }
-}
-
-pub struct UniformSystem<S: UniformWaveSource> {
+pub struct UniformSystem<S: WaveSource> {
     wave_sources: Vec<S>,
     wavenums: Vec<Float>,
     attens: Vec<Float>,
     temperature: Float,
 }
 
-impl<S: UniformWaveSource> UniformSystem<S> {
+impl<S: WaveSource> UniformSystem<S> {
     pub fn new(temperature: Float) -> Self {
         Self {
             wave_sources: vec![],
@@ -83,7 +57,7 @@ impl<S: UniformWaveSource> UniformSystem<S> {
     }
 }
 
-impl<S: UniformWaveSource> WaveSourceContainer<S> for UniformSystem<S> {
+impl<S: WaveSource> WaveSourceContainer<S> for UniformSystem<S> {
     fn wave_sources(&self) -> &[S] {
         &self.wave_sources
     }
@@ -100,13 +74,21 @@ impl<S: UniformWaveSource> WaveSourceContainer<S> for UniformSystem<S> {
     }
 }
 
-impl<S: UniformWaveSource> PropagationMedium for UniformSystem<S> {
+impl<S: WaveSource> PropagationMedium for UniformSystem<S> {
     fn propagate(&self, target: Vector3) -> Complex {
         self.wave_sources
             .iter()
             .zip(self.wavenums.iter())
             .zip(self.attens.iter())
-            .map(|((source, &wavenum), &atten)| source.propagate(target, wavenum, atten))
+            .map(|((source, &wavenum), &atten)| {
+                let diff = crate::fmath::sub(target, source.position());
+                let dist = diff.norm();
+                let theta = crate::fmath::acos(source.direction().dot(&diff) / dist);
+                let d = S::directivity(theta);
+                let r = source.amp() * d * (-dist * atten).exp() / dist;
+                let phi = source.phase() + wavenum * dist;
+                Complex::from_polar(r, phi)
+            })
             .sum()
     }
 }

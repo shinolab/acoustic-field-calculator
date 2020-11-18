@@ -12,7 +12,7 @@
  */
 
 use super::traits::*;
-use crate::core::{utils::calc_wavelength, Float, Vector3, PI};
+use crate::core::{Float, Vector3};
 
 use num::Zero;
 
@@ -24,7 +24,6 @@ pub struct SphereWaveSource {
     amp: Float,
     phase: Float,
     frequency: Float,
-    // wavenumber: Float,
 }
 
 impl SphereWaveSource {
@@ -42,7 +41,6 @@ impl SphereWaveSource {
             amp,
             phase,
             frequency,
-            // wavenumber: 0.,
         }
     }
 }
@@ -52,9 +50,6 @@ impl WaveSource for SphereWaveSource {
     fn directivity(_theta: Float) -> Float {
         1.0
     }
-    // fn set_sound_speed(&mut self, c: Float) {
-    //     self.wavenumber = 2.0 * PI / calc_wavelength(self.frequency, c);
-    // }
     impl_getset!(
         (get = frequency, set = set_frequency, field = frequency),
         Float
