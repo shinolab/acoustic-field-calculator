@@ -4,19 +4,17 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::Float;
-use crate::Optimizer;
-use crate::WaveSource;
-use crate::{Complex, Vector3};
+use crate::*;
 
 use na::{ComplexField, Dynamic, Matrix, VecStorage};
+
 type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
 
 use image::GenericImageView;
@@ -29,7 +27,6 @@ pub struct IFFT {
     bottom_right: Vector3,
     spacing: Float,
     z: Float,
-    sound_speed: Float,
 }
 
 impl IFFT {
@@ -40,7 +37,6 @@ impl IFFT {
         bottom_right: Vector3,
         spacing: Float,
         z: Float,
-        sound_speed: Float,
     ) -> Self {
         Self {
             image_path: path.to_owned(),
@@ -49,7 +45,6 @@ impl IFFT {
             bottom_right,
             spacing,
             z,
-            sound_speed,
         }
     }
 }
@@ -112,10 +107,9 @@ fn fft2d(array: &mut MatrixXcf, w: usize, h: usize) -> MatrixXcf {
 impl Optimizer for IFFT {
     #[allow(clippy::many_single_char_names)]
     #[allow(non_snake_case)]
-    fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
-        for source in wave_sources.iter_mut() {
+    fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {
+        for source in system.wave_sources_mut() {
             source.set_phase(0.);
-            source.set_sound_speed(self.sound_speed);
         }
 
         let img = image::open(&self.image_path).unwrap();
@@ -148,7 +142,8 @@ impl Optimizer for IFFT {
         let up = up.normalize();
 
         let max = tmp.iter().fold(Float::NAN, |m, v| v.abs().max(m));
-        for source in wave_sources.iter_mut() {
+        let sound_speed = system.sound_speed();
+        for source in system.wave_sources_mut() {
             let pos = source.position() - self.bottom_left;
 
             let x = (right.dot(&pos) / self.spacing).ceil() as isize;
@@ -167,7 +162,7 @@ impl Optimizer for IFFT {
             let r = (pos - center + Vector3::new(0., 0., self.z)).norm();
 
             source.set_amp(source.amp() * tmp[(x, y)].abs() / max);
-            source.set_phase(tmp[(x, y)].arg() - source.wavenumber() * r);
+            source.set_phase(tmp[(x, y)].arg() - 2.0 * PI * source.frequency() / sound_speed * r);
         }
     }
 }

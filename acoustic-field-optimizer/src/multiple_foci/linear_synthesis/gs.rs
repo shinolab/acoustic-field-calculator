@@ -4,77 +4,53 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 16/11/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::Float;
-use crate::Optimizer;
-use crate::WaveSource;
-use crate::{Complex, Vector3};
+use crate::multiple_foci::macros::*;
+use crate::*;
 
-use na::{ComplexField, Dynamic, Matrix, VecStorage, U1};
-
-type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
-type VectorXcf = Matrix<Complex, Dynamic, U1, VecStorage<Complex, Dynamic, U1>>;
 const REPEAT: usize = 100;
 
 pub struct GS {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
-    sound_speed: Float,
 }
 
 /// Reference
 /// * Asier Marzo and Bruce W Drinkwater. Holographic acoustic tweezers.Proceedings of theNational Academy of Sciences, 116(1):84–89, 2019.
 impl GS {
-    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, sound_speed: Float) -> Self {
-        Self {
-            foci,
-            amps,
-            sound_speed,
-        }
+    pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
+        Self { foci, amps }
     }
 }
 
 impl Optimizer for GS {
     #[allow(non_snake_case)]
     #[allow(clippy::many_single_char_names)]
-    fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
-        for source in wave_sources.iter_mut() {
+    fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {
+        for source in system.wave_sources_mut() {
             source.set_phase(0.);
-            source.set_sound_speed(self.sound_speed);
         }
 
-        let num_trans = wave_sources.len();
-        let foci = &self.foci;
-        let amps = &self.amps;
+        let m = self.foci.len();
+        let n = system.wave_sources().len();
 
-        let m = foci.len();
-        let n = num_trans;
-
-        let G = MatrixXcf::from_iterator(
-            m,
-            n,
-            wave_sources
-                .iter()
-                .map(|source| {
-                    self.foci
-                        .iter()
-                        .map(|&fp| source.propagate(fp))
-                        .collect::<Vec<_>>()
-                })
-                .flatten(),
-        );
-
+        let G = generate_propagation_matrix(system, &self.foci);
         let Gh = G.map(|a| a.conj()).transpose();
 
-        let p0 = VectorXcf::from_iterator(m, amps.iter().map(|&a| Complex::new(a, 0.0)));
-        let q0 =
-            VectorXcf::from_iterator(n, wave_sources.iter().map(|s| Complex::new(s.amp(), 0.)));
+        let p0 = VectorXcf::from_iterator(m, self.amps.iter().map(|&a| Complex::new(a, 0.0)));
+        let q0 = VectorXcf::from_iterator(
+            n,
+            system
+                .wave_sources()
+                .iter()
+                .map(|s| Complex::new(s.amp(), 0.)),
+        );
         let mut q = q0.clone();
 
         for _ in 0..REPEAT {
@@ -91,7 +67,7 @@ impl Optimizer for GS {
             );
         }
 
-        for (wave_source, qe) in wave_sources.iter_mut().zip(q.iter()) {
+        for (wave_source, qe) in system.wave_sources_mut().iter_mut().zip(q.iter()) {
             let amp = qe.abs();
             let phase = qe.argument();
             wave_source.set_amp(amp);
