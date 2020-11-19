@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -70,7 +70,7 @@ static DIR_COEF_D: [Float; 10] = [
 
 const ANGLE_DIV: Float = PI / 18.0;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 /// Ultrasound transducer [T4010A1](https://www.nicera.co.jp/products/ultrasonic-sensor/open-aperture-type) model
 pub struct T4010A1 {

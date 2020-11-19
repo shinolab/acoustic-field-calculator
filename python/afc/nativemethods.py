@@ -81,16 +81,16 @@ class T4010A1(Structure):
         return (self.x, self.y, self.z)
 
     @property
-    def dir(self):
+    def direction(self):
         pass
 
-    @dir.setter
-    def dir(self, direction):
+    @direction.setter
+    def direction(self, direction):
         self.nx = direction[0]
         self.ny = direction[1]
         self.nz = direction[2]
 
-    @dir.getter
+    @direction.getter
     def dir(self):
         return (self.nx, self.ny, self.nz)
 
