@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["builder",""]],"struct":[["CpuCalculator","Normal Calculator"]],"trait":[["WaveSourceContainer",""]]});
+initSidebarItems({"struct":[["CpuCalculator","Normal Calculator"]],"trait":[["FieldCalculator","Calculate field at observe area"]]});

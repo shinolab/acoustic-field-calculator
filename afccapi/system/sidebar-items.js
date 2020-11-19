@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["AFC_AddSphereWaveSource",""],["AFC_AddT4010A1",""],["AFC_CreateUniformSystem",""],["AFC_FreeUniformSystem",""],["AFC_GetWaveSources",""],["AFC_UniformSystemInfo",""],["AFC_UniformSystemSoundSpeed",""],["AFC_UniformSystemSourceInfo",""]]});

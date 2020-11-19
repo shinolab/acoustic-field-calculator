@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["UniformSystem",""]],"trait":[["PropagationMedium",""],["WaveSourceContainer",""]]});

@@ -25,30 +25,46 @@
 <span id="24">24</span>
 <span id="25">25</span>
 <span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">itertools</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nalgebra</span> <span class="kw">as</span> <span class="ident">na</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">static_assertions</span>;
+
+<span class="macro">assert_cfg</span><span class="macro">!</span>(
+    <span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gpu&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;double&quot;</span>)),
+    <span class="string">&quot;GPU backend cannot be used with double precision float.&quot;</span>
+);
+
+<span class="doccomment">/// Calculator</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">calculator</span>;
+<span class="kw">mod</span> <span class="ident">core</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;accurate&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="doccomment">/// accurate mode</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">accurate</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">calculator</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">core</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">field_buffer</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gpu&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="doccomment">/// gpu modules</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gpu</span>;
 
+<span class="doccomment">/// Field buffer defines what kind of field to calculate and contains calculation results.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">field_buffer</span>;
+<span class="doccomment">/// provide functions of fast math calculation</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fmath</span>;
+<span class="doccomment">/// Observe area is a set of observing points</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">observe_area</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
+<span class="doccomment">/// System is an environment where wave sources are located. Currently, this library supports only uniform propagation medium.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">system</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">wave_sources</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="kw-2">*</span>;

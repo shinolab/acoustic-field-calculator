@@ -158,29 +158,6 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: apo.rs
@@ -188,29 +165,21 @@
  * Created Date: 03/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Float</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Optimizer</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WaveSource</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Complex</span>, <span class="ident">Vector3</span>};
-
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">na</span>::<span class="ident">Normed</span>;
-<span class="kw">use</span> <span class="ident">na</span>::{<span class="ident">ComplexField</span>, <span class="ident">Dynamic</span>, <span class="ident">Matrix</span>, <span class="ident">VecStorage</span>, <span class="ident">U1</span>};
-
-<span class="kw">type</span> <span class="ident">MatrixXcf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">Dynamic</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">Dynamic</span><span class="op">&gt;&gt;</span>;
-<span class="kw">type</span> <span class="ident">VectorXcf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span><span class="op">&gt;&gt;</span>;
-<span class="kw">type</span> <span class="ident">VectorXf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span><span class="op">&gt;&gt;</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">multiple_foci</span>::<span class="ident">macros</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
 
 <span class="kw">const</span> <span class="ident">EPS</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">1e-8</span>;
 <span class="kw">const</span> <span class="ident">K_MAX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">200</span>;
 <span class="kw">const</span> <span class="ident">LINE_SEARCH_MAX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">100</span>;
 
+<span class="doccomment">/// Acoustic Power Optimization</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">APO</span> {
     <span class="ident">foci</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vector3</span><span class="op">&gt;</span>,
     <span class="ident">amps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Float</span><span class="op">&gt;</span>,
@@ -264,6 +233,7 @@
     <span class="comment">// Does not consider Wolfe-Powell condition</span>
     <span class="comment">// Only search alpha in [0,1)</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>)]</span>
     <span class="kw">fn</span> <span class="ident">line_search</span>(
         <span class="ident">q</span>: <span class="kw-2">&amp;</span><span class="ident">VectorXcf</span>,
         <span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">VectorXcf</span>,
@@ -290,33 +260,17 @@
 
 <span class="kw">impl</span> <span class="ident">Optimizer</span> <span class="kw">for</span> <span class="ident">APO</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>, <span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wave_sources</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">S</span>]) {
-        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">wave_sources</span>.<span class="ident">iter_mut</span>() {
+    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">system</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UniformSystem</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
+        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">system</span>.<span class="ident">wave_sources_mut</span>() {
             <span class="ident">source</span>.<span class="ident">set_phase</span>(<span class="number">0.</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">num_trans</span> <span class="op">=</span> <span class="ident">wave_sources</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">foci</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">foci</span>;
-        <span class="kw">let</span> <span class="ident">amps</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">amps</span>;
+        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">foci</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">system</span>.<span class="ident">wave_sources</span>().<span class="ident">len</span>();
 
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">foci</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">num_trans</span>;
+        <span class="kw">let</span> <span class="ident">G</span> <span class="op">=</span> <span class="ident">generate_propagation_matrix</span>(<span class="ident">system</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">foci</span>);
 
-        <span class="kw">let</span> <span class="ident">G</span> <span class="op">=</span> <span class="ident">MatrixXcf</span>::<span class="ident">from_iterator</span>(
-            <span class="ident">m</span>,
-            <span class="ident">n</span>,
-            <span class="ident">wave_sources</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> {
-                    <span class="self">self</span>.<span class="ident">foci</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">fp</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">propagate</span>(<span class="ident">fp</span>))
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;&gt;</span>()
-                })
-                .<span class="ident">flatten</span>(),
-        );
-
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">VectorXcf</span>::<span class="ident">from_iterator</span>(<span class="ident">m</span>, <span class="ident">amps</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">a</span><span class="op">|</span> <span class="ident">Complex</span>::<span class="ident">new</span>(<span class="ident">a</span>, <span class="number">0.</span>)));
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">VectorXcf</span>::<span class="ident">from_iterator</span>(<span class="ident">m</span>, <span class="self">self</span>.<span class="ident">amps</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">a</span><span class="op">|</span> <span class="ident">Complex</span>::<span class="ident">new</span>(<span class="ident">a</span>, <span class="number">0.</span>)));
         <span class="kw">let</span> <span class="ident">p2</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">norm_squared</span>());
 
         <span class="kw">let</span> <span class="ident">I</span> <span class="op">=</span> <span class="ident">MatrixXcf</span>::<span class="ident">identity</span>(<span class="ident">n</span>, <span class="ident">n</span>);
@@ -356,7 +310,7 @@
         }
 
         <span class="kw">let</span> <span class="ident">max_coeff</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">camax</span>();
-        <span class="kw">for</span> (<span class="ident">wave_source</span>, <span class="ident">qe</span>) <span class="kw">in</span> <span class="ident">wave_sources</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">q</span>.<span class="ident">iter</span>()) {
+        <span class="kw">for</span> (<span class="ident">wave_source</span>, <span class="ident">qe</span>) <span class="kw">in</span> <span class="ident">system</span>.<span class="ident">wave_sources_mut</span>().<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">q</span>.<span class="ident">iter</span>()) {
             <span class="kw">let</span> <span class="ident">amp</span> <span class="op">=</span> <span class="ident">wave_source</span>.<span class="ident">amp</span>() <span class="op">*</span> <span class="ident">qe</span>.<span class="ident">abs</span>() <span class="op">/</span> <span class="ident">max_coeff</span>;
             <span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> <span class="ident">qe</span>.<span class="ident">argument</span>();
             <span class="ident">wave_source</span>.<span class="ident">set_amp</span>(<span class="ident">amp</span>);

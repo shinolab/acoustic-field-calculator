@@ -39,10 +39,6 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: focal_point.rs
@@ -50,19 +46,16 @@
  * Created Date: 27/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 28/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">PI</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Optimizer</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Vector3</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WaveSource</span>;
-
+<span class="doccomment">/// Producing a single focal point</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FocalPoint</span> {
     <span class="ident">point</span>: <span class="ident">Vector3</span>,
 }
@@ -74,14 +67,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Optimizer</span> <span class="kw">for</span> <span class="ident">FocalPoint</span> {
-    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wave_sources</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">S</span>]) {
+    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">system</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UniformSystem</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">focal_point</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">point</span>;
-        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">wave_sources</span> {
+        <span class="kw">let</span> <span class="ident">sound_speed</span> <span class="op">=</span> <span class="ident">system</span>.<span class="ident">sound_speed</span>();
+        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">system</span>.<span class="ident">wave_sources_mut</span>() {
             <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">position</span>();
-
             <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> (<span class="ident">pos</span> <span class="op">-</span> <span class="ident">focal_point</span>).<span class="ident">norm</span>();
-
-            <span class="kw">let</span> <span class="ident">wave_length</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span> <span class="op">/</span> <span class="ident">source</span>.<span class="ident">wavenumber</span>();
+            <span class="kw">let</span> <span class="ident">wave_length</span> <span class="op">=</span> <span class="ident">sound_speed</span> <span class="op">/</span> <span class="ident">source</span>.<span class="ident">frequency</span>();
             <span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> (<span class="ident">d</span> <span class="op">%</span> <span class="ident">wave_length</span>) <span class="op">/</span> <span class="ident">wave_length</span>;
             <span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span> <span class="op">*</span> <span class="ident">phase</span>;
             <span class="ident">source</span>.<span class="ident">set_phase</span>(<span class="ident">phase</span>);

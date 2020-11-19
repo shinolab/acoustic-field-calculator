@@ -227,7 +227,6 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
-<span id="229">229</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: observe_area.rs
@@ -235,15 +234,14 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 21/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">gpu</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">observe_area</span>::<span class="ident">grid</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">observe_area</span>::{<span class="ident">grid</span>::<span class="kw-2">*</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>;
@@ -259,16 +257,16 @@
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">AFC_FreeScatterArea</span>(<span class="ident">handle</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
-    <span class="kw">let</span> <span class="ident">_area</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ScatterArea</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="ident">handle</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
-}
-
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">improper_ctypes_definitions</span>)]</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">AFC_ScatterAddObservePoint</span>(<span class="ident">handle</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">p</span>: <span class="ident">Vector3</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">area</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ScatterArea</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="ident">handle</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
     <span class="ident">area</span>.<span class="ident">add_observe_point</span>(<span class="ident">p</span>);
     <span class="ident">forget</span>(<span class="ident">area</span>);
+}
+
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">AFC_FreeScatterArea</span>(<span class="ident">handle</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
+    <span class="kw">let</span> <span class="ident">_area</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ScatterArea</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">from_raw</span>(<span class="ident">handle</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
 }
 
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>

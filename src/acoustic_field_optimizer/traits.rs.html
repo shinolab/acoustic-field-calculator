@@ -24,17 +24,17 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 21/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">wave_sources</span>::<span class="ident">WaveSource</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">UniformSystem</span>, <span class="ident">WaveSource</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Optimizer</span> {
-    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wave_sources</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">S</span>]);
+    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">system</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UniformSystem</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "acoustic_field_optimizer";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

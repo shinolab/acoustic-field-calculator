@@ -17,9 +17,6 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: mod.rs
@@ -27,20 +24,17 @@
  * Created Date: 19/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 23/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="kw">mod</span> <span class="ident">traits</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">cpu_calculator</span>;
+<span class="kw">mod</span> <span class="ident">traits</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builder</span>::<span class="ident">CalculatorBuilder</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cpu_calculator</span>::<span class="ident">CpuCalculator</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">WaveSourceContainer</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">FieldCalculator</span>;
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "acoustic_field_calculator";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

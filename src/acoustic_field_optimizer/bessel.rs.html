@@ -51,7 +51,6 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
-<span id="53">53</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: bessel.rs
@@ -59,19 +58,17 @@
  * Created Date: 05/06/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 28/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Optimizer</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Vector3</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">WaveSource</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
-
+<span class="doccomment">/// Producing a bessel beam</span>
+<span class="doccomment">/// * Hasegawa, Keisuke, et al. &quot;Electronically steerable ultrasound-driven long narrow air stream.&quot; Applied Physics Letters 111.6 (2017): 064104.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BesselBeam</span> {
     <span class="ident">point</span>: <span class="ident">Vector3</span>,
     <span class="ident">dir</span>: <span class="ident">Vector3</span>,
@@ -85,12 +82,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Optimizer</span> <span class="kw">for</span> <span class="ident">BesselBeam</span> {
-    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sound_source</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">S</span>]) {
+    <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">system</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UniformSystem</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">point</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">point</span>;
         <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dir</span>;
+        <span class="kw">let</span> <span class="ident">sound_speed</span> <span class="op">=</span> <span class="ident">system</span>.<span class="ident">sound_speed</span>();
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vector3</span>::<span class="ident">new</span>(<span class="ident">dir</span>[<span class="number">1</span>], <span class="op">-</span><span class="ident">dir</span>[<span class="number">0</span>], <span class="number">0.</span>);
         <span class="kw">let</span> <span class="ident">theta_w</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">norm</span>().<span class="ident">asin</span>();
-        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">sound_source</span> {
+        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">system</span>.<span class="ident">wave_sources_mut</span>() {
             <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">position</span>();
 
             <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">pos</span> <span class="op">-</span> <span class="ident">point</span>;
@@ -99,7 +97,7 @@
             <span class="kw">let</span> <span class="ident">dist</span> <span class="op">=</span>
                 <span class="self">self</span>.<span class="ident">theta</span>.<span class="ident">sin</span>() <span class="op">*</span> (<span class="ident">r</span>[<span class="number">0</span>] <span class="op">*</span> <span class="ident">r</span>[<span class="number">0</span>] <span class="op">+</span> <span class="ident">r</span>[<span class="number">1</span>] <span class="op">*</span> <span class="ident">r</span>[<span class="number">1</span>]).<span class="ident">sqrt</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">theta</span>.<span class="ident">cos</span>() <span class="op">*</span> <span class="ident">r</span>[<span class="number">2</span>];
 
-            <span class="kw">let</span> <span class="ident">wave_length</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span> <span class="op">/</span> <span class="ident">source</span>.<span class="ident">wavenumber</span>();
+            <span class="kw">let</span> <span class="ident">wave_length</span> <span class="op">=</span> <span class="ident">sound_speed</span> <span class="op">/</span> <span class="ident">source</span>.<span class="ident">frequency</span>();
             <span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> (<span class="ident">dist</span> <span class="op">%</span> <span class="ident">wave_length</span>) <span class="op">/</span> <span class="ident">wave_length</span>;
             <span class="kw">let</span> <span class="ident">phase</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span> <span class="op">*</span> <span class="ident">PI</span> <span class="op">*</span> <span class="ident">phase</span>;
             <span class="ident">source</span>.<span class="ident">set_phase</span>(<span class="ident">phase</span>);

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["grid","Observation points on the grid"],["scatter","Scatter observation points"]],"trait":[["ObserveArea",""]]});
+initSidebarItems({"mod":[["grid","Observation points on the grid"],["scatter","Scatter observation points"]],"struct":[["GridArea","Observation points on grid"],["GridAreaBuilder","Builder for GridArea"],["ScatterArea","Scatter observation points"]],"trait":[["ObserveArea",""]]});

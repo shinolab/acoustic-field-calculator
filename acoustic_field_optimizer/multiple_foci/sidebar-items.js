@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["APO",""],["GS",""],["GSPAT",""],["GaussNewton",""],["GradientDescent",""],["Horn",""],["IFFT",""],["LM",""],["Long",""],["Naive",""]]});
+initSidebarItems({"mod":[["macros",""]],"struct":[["APO","Acoustic Power Optimization"],["GS","Gerchberg-Saxton"],["GSPAT","GS-PAT"],["GaussNewton","Gauss-Newton"],["GradientDescent","Gradient descent"],["Horn","Inoue et al., 2015"],["IFFT","Inverse FFT"],["LM","Levenberg-Marquardt"],["Long","Long et al., 2014"],["Naive","Naive linear synthesis"]]});

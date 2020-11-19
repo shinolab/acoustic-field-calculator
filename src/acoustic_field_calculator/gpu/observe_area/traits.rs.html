@@ -30,8 +30,6 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: traits.rs
@@ -39,16 +37,14 @@
  * Created Date: 20/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 22/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">observe_area</span>::<span class="ident">grid</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">observe_area</span>::<span class="ident">scatter</span>::<span class="ident">ScatterArea</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">observe_area</span>::<span class="ident">ObserveArea</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">observe_area</span>::{<span class="ident">grid</span>::<span class="kw-2">*</span>, <span class="ident">scatter</span>::<span class="ident">ScatterArea</span>, <span class="ident">ObserveArea</span>};
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SizedArea</span>: <span class="ident">ObserveArea</span> {
     <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>);
@@ -63,7 +59,7 @@
 
 <span class="kw">impl</span> <span class="ident">SizedArea</span> <span class="kw">for</span> <span class="ident">ScatterArea</span> {
     <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>) {
-        (<span class="self">self</span>.<span class="ident">observe_points</span>().<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">1</span>, <span class="number">1</span>)
+        (<span class="self">self</span>.<span class="ident">points</span>().<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">1</span>, <span class="number">1</span>)
     }
 }
 </pre></div>

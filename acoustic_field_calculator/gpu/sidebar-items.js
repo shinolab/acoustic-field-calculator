@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["GpuCalculator","GPU Calculator"]],"trait":[["GpuFieldBuffer","Calculate field by gpu calculator"],["GpuWaveSource","Gpu calculator requires directivity and attenuation coefficient."],["SizedArea",""]]});
+initSidebarItems({"struct":[["GpuCalculator","GPU Calculator"]],"trait":[["GpuFieldBuffer","Calculate field by gpu calculator"],["GpuPropagationMedium",""],["SizedArea",""]]});

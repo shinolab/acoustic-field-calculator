@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["CalculatorBuilder","Builder for calculators"],["Empty",""],["Filled",""],["Normal",""]]});

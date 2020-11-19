@@ -208,11 +208,6 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: grid_field_builder.rs
@@ -220,20 +215,15 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">bounds</span>::<span class="ident">Bounds</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">dimension</span>::<span class="ident">Axis</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">Float</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Vector3</span>;
-
-<span class="kw">use</span> <span class="ident">typenum</span>::{<span class="ident">N1</span>, <span class="ident">N2</span>, <span class="ident">N3</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">bounds</span>::<span class="ident">Bounds</span>, <span class="ident">dimension</span>::<span class="ident">Axis</span>, <span class="kw-2">*</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::{<span class="ident">Float</span>, <span class="ident">Vector3</span>};
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">transmute</span>;
@@ -269,6 +259,12 @@
             <span class="ident">z_range_state</span>: <span class="ident">PhantomData</span>,
             <span class="ident">resolution_state</span>: <span class="ident">PhantomData</span>,
         }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GridAreaBuilder</span><span class="op">&lt;</span><span class="ident">Empty</span>, <span class="ident">Empty</span>, <span class="ident">Empty</span>, <span class="ident">Empty</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class="ident">new</span>()
     }
 }
 
@@ -409,7 +405,7 @@
 <span class="kw">impl</span> <span class="ident">GridAreaBuilder</span><span class="op">&lt;</span><span class="ident">Used</span>, <span class="ident">Used</span>, <span class="ident">Used</span>, <span class="ident">Used</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Generate three-dimensional GridArea.</span>
     <span class="doccomment">/// You must specify the observation range/point on all axes and resolution before</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">GridArea</span><span class="op">&lt;</span><span class="ident">N3</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">GridArea</span><span class="op">&lt;</span><span class="ident">N3</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nx</span> <span class="op">=</span> ((<span class="self">self</span>.<span class="ident">x_range</span>.<span class="number">1</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">x_range</span>.<span class="number">0</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">resolution</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">ny</span> <span class="op">=</span> ((<span class="self">self</span>.<span class="ident">y_range</span>.<span class="number">1</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">y_range</span>.<span class="number">0</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">resolution</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">nz</span> <span class="op">=</span> ((<span class="self">self</span>.<span class="ident">z_range</span>.<span class="number">1</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">z_range</span>.<span class="number">0</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">resolution</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
@@ -420,12 +416,6 @@
             <span class="ident">origin</span>,
             <span class="self">self</span>.<span class="ident">resolution</span>,
         )
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GridAreaBuilder</span><span class="op">&lt;</span><span class="ident">Empty</span>, <span class="ident">Empty</span>, <span class="ident">Empty</span>, <span class="ident">Empty</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">new</span>()
     }
 }
 </pre></div>

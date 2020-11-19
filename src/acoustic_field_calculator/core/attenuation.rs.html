@@ -46,13 +46,6 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
-<span id="51">51</span>
-<span id="52">52</span>
-<span id="53">53</span>
-<span id="54">54</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
  * File: attenuation.rs
@@ -60,7 +53,7 @@
  * Created Date: 14/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -68,6 +61,9 @@
  */</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">Float</span>;
+
+<span class="kw">const</span> <span class="ident">T0</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">293.15</span>;
+<span class="kw">const</span> <span class="ident">T01</span>: <span class="ident">Float</span> <span class="op">=</span> <span class="number">273.16</span>;
 
 <span class="doccomment">/// Returns an attenuation coefficients due to atmospheric absorption in a unit of [Np/mm].</span>
 <span class="doccomment">///</span>
@@ -80,30 +76,20 @@
 <span class="doccomment">/// * `ps` - An atmospheric pressure [atm]</span>
 <span class="doccomment">/// * `ps0` - A reference atmospheric pressure [atm]</span>
 <span class="doccomment">/// * `t` - An atmospheric temperature [K]</span>
-<span class="doccomment">/// * `t0` - A reference temperature [K]</span>
-<span class="doccomment">/// * `t01` - A triple-point isotherm temperature [K]</span>
 <span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attenuation_coef</span>(
-    <span class="ident">freq</span>: <span class="ident">Float</span>,
-    <span class="ident">hr</span>: <span class="ident">Float</span>,
-    <span class="ident">ps</span>: <span class="ident">Float</span>,
-    <span class="ident">ps0</span>: <span class="ident">Float</span>,
-    <span class="ident">t</span>: <span class="ident">Float</span>,
-    <span class="ident">t0</span>: <span class="ident">Float</span>,
-    <span class="ident">t01</span>: <span class="ident">Float</span>,
-) <span class="op">-&gt;</span> <span class="ident">Float</span> {
-    <span class="kw">let</span> <span class="ident">psat</span> <span class="op">=</span> <span class="ident">ps0</span> <span class="op">*</span> (<span class="number">10.0</span> <span class="kw">as</span> <span class="ident">Float</span>).<span class="ident">powf</span>(<span class="op">-</span><span class="number">6.8346</span> <span class="op">*</span> (<span class="ident">t01</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">powf</span>(<span class="number">1.261</span>) <span class="op">+</span> <span class="number">4.6151</span>);
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attenuation_coef</span>(<span class="ident">freq</span>: <span class="ident">Float</span>, <span class="ident">hr</span>: <span class="ident">Float</span>, <span class="ident">ps</span>: <span class="ident">Float</span>, <span class="ident">ps0</span>: <span class="ident">Float</span>, <span class="ident">t</span>: <span class="ident">Float</span>) <span class="op">-&gt;</span> <span class="ident">Float</span> {
+    <span class="kw">let</span> <span class="ident">psat</span> <span class="op">=</span> <span class="ident">ps0</span> <span class="op">*</span> (<span class="number">10.0</span> <span class="kw">as</span> <span class="ident">Float</span>).<span class="ident">powf</span>(<span class="op">-</span><span class="number">6.8346</span> <span class="op">*</span> (<span class="ident">T01</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">powf</span>(<span class="number">1.261</span>) <span class="op">+</span> <span class="number">4.6151</span>);
     <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">ps0</span> <span class="op">*</span> (<span class="ident">hr</span> <span class="op">/</span> <span class="ident">ps</span>) <span class="op">*</span> (<span class="ident">psat</span> <span class="op">/</span> <span class="ident">ps0</span>);
     <span class="kw">let</span> <span class="ident">f_ro</span> <span class="op">=</span> (<span class="number">24.</span> <span class="op">+</span> <span class="number">4.04e4</span> <span class="op">*</span> <span class="ident">h</span> <span class="op">*</span> (<span class="number">0.02</span> <span class="op">+</span> <span class="ident">h</span>) <span class="op">/</span> (<span class="number">0.391</span> <span class="op">+</span> <span class="ident">h</span>)) <span class="op">/</span> <span class="ident">ps0</span>;
     <span class="kw">let</span> <span class="ident">f_rn</span> <span class="op">=</span> (<span class="number">1.</span> <span class="op">/</span> <span class="ident">ps0</span>)
-        <span class="op">*</span> (<span class="number">9.</span> <span class="op">+</span> <span class="number">280.</span> <span class="op">*</span> <span class="ident">h</span> <span class="op">*</span> (<span class="op">-</span><span class="number">4.17</span> <span class="op">*</span> ((<span class="ident">t0</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">powf</span>(<span class="number">1.</span> <span class="op">/</span> <span class="number">3.</span>) <span class="op">-</span> <span class="number">1.</span>)).<span class="ident">exp</span>())
-        <span class="op">*</span> (<span class="ident">t0</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">powf</span>(<span class="number">1.</span> <span class="op">/</span> <span class="number">2.</span>);
+        <span class="op">*</span> (<span class="number">9.</span> <span class="op">+</span> <span class="number">280.</span> <span class="op">*</span> <span class="ident">h</span> <span class="op">*</span> (<span class="op">-</span><span class="number">4.17</span> <span class="op">*</span> ((<span class="ident">T0</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">powf</span>(<span class="number">1.</span> <span class="op">/</span> <span class="number">3.</span>) <span class="op">-</span> <span class="number">1.</span>)).<span class="ident">exp</span>())
+        <span class="op">*</span> (<span class="ident">T0</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">powf</span>(<span class="number">1.</span> <span class="op">/</span> <span class="number">2.</span>);
     <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">freq</span> <span class="op">/</span> <span class="ident">ps</span>;
 
     <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> (<span class="ident">f</span> <span class="op">*</span> <span class="ident">f</span>) <span class="op">/</span> <span class="ident">ps0</span>
         <span class="op">*</span> <span class="ident">ps</span>
-        <span class="op">*</span> (<span class="number">1.84</span> <span class="op">*</span> (<span class="ident">t</span> <span class="op">/</span> <span class="ident">t0</span>).<span class="ident">powf</span>(<span class="number">1.</span> <span class="op">/</span> <span class="number">2.</span>) <span class="op">*</span> <span class="number">1e-11</span>
-            <span class="op">+</span> (<span class="ident">t</span> <span class="op">/</span> <span class="ident">t0</span>).<span class="ident">powf</span>(<span class="op">-</span><span class="number">5.</span> <span class="op">/</span> <span class="number">2.</span>)
+        <span class="op">*</span> (<span class="number">1.84</span> <span class="op">*</span> (<span class="ident">t</span> <span class="op">/</span> <span class="ident">T0</span>).<span class="ident">powf</span>(<span class="number">1.</span> <span class="op">/</span> <span class="number">2.</span>) <span class="op">*</span> <span class="number">1e-11</span>
+            <span class="op">+</span> (<span class="ident">t</span> <span class="op">/</span> <span class="ident">T0</span>).<span class="ident">powf</span>(<span class="op">-</span><span class="number">5.</span> <span class="op">/</span> <span class="number">2.</span>)
                 <span class="op">*</span> (<span class="number">0.01278</span> <span class="op">*</span> (<span class="op">-</span><span class="number">2239.1</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">exp</span>() <span class="op">/</span> (<span class="ident">f_ro</span> <span class="op">+</span> <span class="ident">f</span> <span class="op">*</span> <span class="ident">f</span> <span class="op">/</span> <span class="ident">f_ro</span>)
                     <span class="op">+</span> <span class="number">0.1068</span> <span class="op">*</span> (<span class="op">-</span><span class="number">3352.</span> <span class="op">/</span> <span class="ident">t</span>).<span class="ident">exp</span>() <span class="op">/</span> (<span class="ident">f_rn</span> <span class="op">+</span> <span class="ident">f</span> <span class="op">*</span> <span class="ident">f</span> <span class="op">/</span> <span class="ident">f_rn</span>)));
     <span class="ident">alpha</span> <span class="op">*</span> <span class="number">1e-3</span>

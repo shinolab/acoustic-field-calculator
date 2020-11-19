@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["AFC_AddSphereWaveSource",""],["AFC_AddT4010A1",""],["AFC_Calculate",""],["AFC_CalculateComplex",""],["AFC_CreateCalculator",""],["AFC_FreeCalculator",""],["AFC_GetWaveSources",""]]});
+initSidebarItems({"fn":[["AFC_Calculate",""],["AFC_CreateCalculator",""],["AFC_FreeCalculator",""]]});

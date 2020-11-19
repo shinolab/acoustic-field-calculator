@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Accurate",""],["AccurateCalculator","Accurate Calculator"]],"trait":[["AccurateFieldBuffer","Calculate field by accurate calculator"]]});
+initSidebarItems({"struct":[["AccurateCalculator","Accurate Calculator"]]});

@@ -52,10 +52,10 @@
 <span class="comment">/*
  * File: field_buffer.rs
  * Project: src
- * Created Date: 21/09/2020
+ * Created Date: 19/11/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -86,15 +86,15 @@
 }
 
 <span class="macro">impl_create_free</span><span class="macro">!</span>(
-    <span class="ident">PressureField</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>,
+    <span class="ident">PressureField</span>,
     <span class="ident">AFC_CreatePressureField</span>,
     <span class="ident">AFC_FreePressureField</span>
 );
 
-<span class="macro">impl_create_free</span><span class="macro">!</span>(<span class="ident">PowerField</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>, <span class="ident">AFC_CreatePowerField</span>, <span class="ident">AFC_FreePowerField</span>);
+<span class="macro">impl_create_free</span><span class="macro">!</span>(<span class="ident">PowerField</span>, <span class="ident">AFC_CreatePowerField</span>, <span class="ident">AFC_FreePowerField</span>);
 
 <span class="macro">impl_create_free</span><span class="macro">!</span>(
-    <span class="ident">ComplexPressureField</span><span class="op">&lt;</span><span class="ident">Complex</span><span class="op">&gt;</span>,
+    <span class="ident">ComplexPressureField</span>,
     <span class="ident">AFC_CreateComplexPressureField</span>,
     <span class="ident">AFC_FreeComplexPressureField</span>
 );

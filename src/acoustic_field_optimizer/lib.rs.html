@@ -14,21 +14,31 @@
 <span id="13">13</span>
 <span id="14">14</span>
 <span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">nalgebra</span> <span class="kw">as</span> <span class="ident">na</span>;
 
 <span class="kw">mod</span> <span class="ident">bessel</span>;
 <span class="kw">mod</span> <span class="ident">focal_point</span>;
+<span class="doccomment">/// Producing multiple foci</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">multiple_foci</span>;
 <span class="kw">mod</span> <span class="ident">traits</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">Optimizer</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">wave_sources</span>::<span class="ident">WaveSource</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::{<span class="ident">Complex</span>, <span class="ident">Vector3</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::{<span class="ident">Float</span>, <span class="ident">PI</span>};
+<span class="kw">use</span> <span class="ident">acoustic_field_calculator</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bessel</span>::<span class="ident">BesselBeam</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">focal_point</span>::<span class="ident">FocalPoint</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::<span class="ident">Optimizer</span>;
+
+<span class="kw">use</span> <span class="ident">na</span>::{<span class="ident">ComplexField</span>, <span class="ident">Dynamic</span>, <span class="ident">Matrix</span>, <span class="ident">Normed</span>, <span class="ident">VecStorage</span>, <span class="ident">U1</span>};
+
+<span class="kw">type</span> <span class="ident">MatrixXcf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">Dynamic</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">Dynamic</span><span class="op">&gt;&gt;</span>;
+<span class="kw">type</span> <span class="ident">MatrixXf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">Dynamic</span>, <span class="ident">Dynamic</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">Dynamic</span>, <span class="ident">Dynamic</span><span class="op">&gt;&gt;</span>;
+<span class="kw">type</span> <span class="ident">VectorXcf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Complex</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span><span class="op">&gt;&gt;</span>;
+<span class="kw">type</span> <span class="ident">VectorXf</span> <span class="op">=</span> <span class="ident">Matrix</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span>, <span class="ident">VecStorage</span><span class="op">&lt;</span><span class="ident">Float</span>, <span class="ident">Dynamic</span>, <span class="ident">U1</span><span class="op">&gt;&gt;</span>;
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "acoustic_field_optimizer";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

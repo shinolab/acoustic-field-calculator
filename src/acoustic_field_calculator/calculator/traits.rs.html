@@ -23,74 +23,30 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">/*
- * File: traits.rs
- * Project: calculator
- * Created Date: 19/09/2020
- * Author: Shun Suzuki
- * -----
- * Last Modified: 25/09/2020
- * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
- * -----
- * Copyright (c) 2020 Hapis Lab. All rights reserved.
- *
- */</span>
+* File: trait.rs
+* Project: calculator
+* Created Date: 19/11/2020
+* Author: Shun Suzuki
+* -----
+* Last Modified: 19/11/2020
+* Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
+* -----
+* Copyright (c) 2020 Hapis Lab. All rights reserved.
+*
+*/</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">wave_sources</span>::<span class="ident">WaveSource</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">core</span>::<span class="ident">Float</span>;
-
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WaveSourceContainer</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns all of the wave sources</span>
-    <span class="kw">fn</span> <span class="ident">wave_sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">S</span>];
-    <span class="doccomment">/// Returns all of the wave sources as mutable</span>
-    <span class="kw">fn</span> <span class="ident">wave_sources_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// Returns speed of sound</span>
-    <span class="kw">fn</span> <span class="ident">sound_speed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Float</span>;
-
-    <span class="doccomment">/// Add new wave source</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `source` - Wave source</span>
-    <span class="doccomment">///</span>
-    <span class="kw">fn</span> <span class="ident">add_wave_source</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">source</span>: <span class="ident">S</span>) {
-        <span class="ident">source</span>.<span class="ident">set_sound_speed</span>(<span class="self">self</span>.<span class="ident">sound_speed</span>());
-        <span class="self">self</span>.<span class="ident">wave_sources_mut</span>().<span class="ident">push</span>(<span class="ident">source</span>);
-    }
-    <span class="doccomment">/// Add new wave sources</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `sources` - A vector of wave sources</span>
-    <span class="doccomment">///</span>
-    <span class="kw">fn</span> <span class="ident">add_wave_sources</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sources</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> <span class="ident">source</span> <span class="kw">in</span> <span class="ident">sources</span> {
-            <span class="self">self</span>.<span class="ident">add_wave_source</span>(<span class="ident">source</span>)
-        }
-    }
+<span class="doccomment">/// Calculate field at observe area</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Arguments</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// * `medium` - Propagation medium</span>
+<span class="doccomment">/// * `observe_area` - Observation area</span>
+<span class="doccomment">/// * `buffer` - Buffer which contains results and define result field type</span>
+<span class="doccomment">///</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FieldCalculator</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">M</span>, <span class="ident">A</span>, <span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">calculate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">medium</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">observe_area</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">F</span>);
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "acoustic_field_calculator";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
