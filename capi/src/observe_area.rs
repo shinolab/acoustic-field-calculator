@@ -4,32 +4,58 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 21/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use acoustic_field_calculator::gpu::*;
-use acoustic_field_calculator::observe_area::grid::*;
+use acoustic_field_calculator::observe_area::{grid::*, scatter::ScatterArea, ScatterAreaBuilder};
 use acoustic_field_calculator::prelude::*;
+use acoustic_field_calculator::{field_type::*, gpu::*};
 
 use std::ffi::c_void;
 use std::mem::forget;
 
-#[no_mangle]
-pub unsafe extern "C" fn AFC_CreateScatterArea(out: *mut *mut c_void) {
-    let area = ScatterArea::new();
-    let mut area = Box::new(area);
-    let ptr = area.as_mut() as *mut _;
-    forget(area);
-    *out = ptr as *mut _;
+use crate::type_inference_aux::FieldTypes;
+
+macro_rules! fields {
+    ($macro: tt) => {
+        $macro!(PressureField, PowerField, ComplexPressureField)
+    };
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn AFC_FreeScatterArea(handle: *mut c_void) {
-    let _area: Box<ScatterArea> = Box::from_raw(handle as *mut _);
+pub unsafe extern "C" fn AFC_CreateScatterArea(out: *mut *mut c_void, field_type: i32) {
+    macro_rules! gen_match_field_type {
+        ($($field_type:ident),*) => {
+            match FieldTypes::from_i32(field_type) {
+                $(FieldTypes::$field_type => {
+                    let area = ScatterAreaBuilder::<$field_type>::new().generate();
+                    let mut area = Box::new(area);
+                    let ptr = area.as_mut() as *mut _;
+                    forget(area);
+                    *out = ptr as *mut _;
+                },)*
+            }
+        };
+    }
+    fields!(gen_match_field_type)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn AFC_FreeScatterArea(handle: *mut c_void, field_type: i32) {
+    macro_rules! gen_match_field_type {
+        ($($field_type:ident),*) => {
+            match FieldTypes::from_i32(field_type) {
+                $(FieldTypes::$field_type => {
+                    let _area : Box<ScatterArea<$field_type>> = Box::from_raw(handle as *mut _);
+                },)*
+            }
+        };
+    }
+    fields!(gen_match_field_type)
 }
 
 #[no_mangle]

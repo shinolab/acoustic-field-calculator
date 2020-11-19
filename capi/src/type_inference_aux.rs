@@ -4,7 +4,7 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -55,12 +55,12 @@ impl ObserveAreaType {
 
 #[derive(FromPrimitive, Copy, Clone, Debug)]
 #[repr(i32)]
-pub enum FieldType {
+pub enum FieldTypes {
     PressureField = 0,
     PowerField = 1,
     ComplexPressureField = 2,
 }
-impl FieldType {
+impl FieldTypes {
     pub fn from_i32(x: i32) -> Self {
         FromPrimitive::from_i32(x).unwrap()
     }
