@@ -2,8 +2,7 @@ name: Doc
 
 on:
   push:
-    tags:
-    - 'v*'
+    branches: [ master ]
 
 jobs:
   build:
@@ -26,7 +25,7 @@ jobs:
         path: target
         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
     - name: build doc
-      run: cargo doc --no-deps --all-features
+      run: cargo doc --no-deps
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
