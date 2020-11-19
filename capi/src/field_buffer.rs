@@ -1,10 +1,10 @@
 /*
  * File: field_buffer.rs
  * Project: src
- * Created Date: 21/09/2020
+ * Created Date: 19/11/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -35,15 +35,15 @@ macro_rules! impl_create_free {
 }
 
 impl_create_free!(
-    PressureField<f32>,
+    PressureField,
     AFC_CreatePressureField,
     AFC_FreePressureField
 );
 
-impl_create_free!(PowerField<f32>, AFC_CreatePowerField, AFC_FreePowerField);
+impl_create_free!(PowerField, AFC_CreatePowerField, AFC_FreePowerField);
 
 impl_create_free!(
-    ComplexPressureField<Complex>,
+    ComplexPressureField,
     AFC_CreateComplexPressureField,
     AFC_FreeComplexPressureField
 );

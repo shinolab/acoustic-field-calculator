@@ -4,92 +4,63 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 01/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use super::traits::WaveSourceContainer;
-use crate::core::Float;
-use crate::field_buffer::FieldBufferCalculable;
-use crate::observe_area::ObserveArea;
-use crate::wave_sources::WaveSource;
+use super::traits::FieldCalculator;
+use crate::{
+    core::wave_sources::WaveSource, field_buffer::FieldBuffer, observe_area::ObserveArea,
+    system::PropagationMedium,
+};
 
 /// Normal Calculator
-pub struct CpuCalculator<S: WaveSource> {
-    sources: Vec<S>,
-    sound_speed: Float,
-}
+pub struct CpuCalculator {}
 
-impl<S: WaveSource> CpuCalculator<S> {
-    pub(crate) fn new(sound_speed: Float) -> Self {
-        Self {
-            sources: vec![],
-            sound_speed,
-        }
+impl Default for CpuCalculator {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
-impl<S: WaveSource> CpuCalculator<S> {
-    /// Calculate field at observe area
-    ///
-    /// # Arguments
-    ///
-    /// * `observe_area` - Observed area to calculate
-    /// * `field` - Field to calculate
-    ///
-    pub fn calculate<'a, A: ObserveArea, T, F: FieldBufferCalculable<T>>(
-        &mut self,
-        observe_area: &A,
-        field: &'a mut F,
-    ) {
-        field.calculate_field(&self, observe_area)
+impl CpuCalculator {
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
-impl<S: WaveSource> WaveSourceContainer<S> for CpuCalculator<S> {
-    fn wave_sources(&self) -> &[S] {
-        &self.sources
-    }
-
-    fn wave_sources_mut(&mut self) -> &mut Vec<S> {
-        &mut self.sources
-    }
-
-    fn sound_speed(&self) -> Float {
-        self.sound_speed
-    }
-}
-
-macro_rules! calc_from_complex_pressure {
-    ($wave_sources: ident, $buffer: ident, $val: ident, $f: expr, $results: expr) => {
+impl<S, M, A, O, F> FieldCalculator<S, M, A, O, F> for CpuCalculator
+where
+    S: WaveSource,
+    M: PropagationMedium<S>,
+    A: ObserveArea,
+    O: Send + Sized + Default + Clone,
+    F: FieldBuffer<O>,
+{
+    fn calculate(&self, medium: &M, observe_area: &A, buffer: &mut F) {
+        let obs_points = observe_area.points();
+        let results = buffer.buffer_mut();
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};
-            $buffer
-                .observe_points()
+            obs_points
                 .par_iter()
                 .map(|&observe_point| {
-                    let $val: Complex = $wave_sources
-                        .iter()
-                        .map(|source| source.propagate(observe_point))
-                        .sum();
-                    $f
+                    let cp = medium.propagate(observe_point);
+                    F::calc_from_complex_pressure(cp)
                 })
-                .collect_into_vec($results);
+                .collect_into_vec(results);
         }
         #[cfg(not(feature = "parallel"))]
         {
-            $results.resize($buffer.observe_points().len(), Default::default());
-            for (result, &observe_point) in $results.iter_mut().zip($buffer.observe_points()) {
-                let $val: Complex = $wave_sources
-                    .iter()
-                    .map(|source| source.propagate(observe_point))
-                    .sum();
-                *result = $f;
+            results.resize(obs_points.len(), Default::default());
+            for (result, &observe_point) in results.iter_mut().zip(obs_points) {
+                let cp = medium.propagate(observe_point);
+                *result = F::calc_from_complex_pressure(cp);
             }
         }
-    };
+    }
 }

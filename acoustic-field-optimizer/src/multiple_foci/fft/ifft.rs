@@ -4,24 +4,23 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::Float;
-use crate::Optimizer;
-use crate::WaveSource;
-use crate::{Complex, Vector3};
+use crate::*;
 
 use na::{ComplexField, Dynamic, Matrix, VecStorage};
+
 type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
 
 use image::GenericImageView;
 use rustfft::FFTplanner;
 
+/// Inverse FFT
 pub struct IFFT {
     image_path: String,
     bottom_left: Vector3,
@@ -109,8 +108,8 @@ fn fft2d(array: &mut MatrixXcf, w: usize, h: usize) -> MatrixXcf {
 impl Optimizer for IFFT {
     #[allow(clippy::many_single_char_names)]
     #[allow(non_snake_case)]
-    fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
-        for source in wave_sources.iter_mut() {
+    fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {
+        for source in system.wave_sources_mut() {
             source.set_phase(0.);
         }
 
@@ -144,7 +143,8 @@ impl Optimizer for IFFT {
         let up = up.normalize();
 
         let max = tmp.iter().fold(Float::NAN, |m, v| v.abs().max(m));
-        for source in wave_sources.iter_mut() {
+        let sound_speed = system.sound_speed();
+        for source in system.wave_sources_mut() {
             let pos = source.position() - self.bottom_left;
 
             let x = (right.dot(&pos) / self.spacing).ceil() as isize;
@@ -163,7 +163,7 @@ impl Optimizer for IFFT {
             let r = (pos - center + Vector3::new(0., 0., self.z)).norm();
 
             source.set_amp(source.amp() * tmp[(x, y)].abs() / max);
-            source.set_phase(tmp[(x, y)].arg() - source.wavenumber() * r);
+            source.set_phase(tmp[(x, y)].arg() - 2.0 * PI * source.frequency() / sound_speed * r);
         }
     }
 }

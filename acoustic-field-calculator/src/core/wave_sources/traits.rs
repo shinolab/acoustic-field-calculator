@@ -4,25 +4,25 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 18/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::{Complex, Float, Vector3};
+use crate::{Float, Vector3};
 
 macro_rules! impl_sync {
     ($name: ident, $( $def: item ),* ) => {
-        #[cfg(feature = "parallel")]
+        // #[cfg(feature = "parallel")]
         pub trait $name: Sync{
             $( $def )*
         }
-        #[cfg(not(feature = "parallel"))]
-        pub trait $name{
-            $( $def )*
-        }
+        // #[cfg(not(feature = "parallel"))]
+        // pub trait $name{
+        //     $( $def )*
+        // }
     };
 }
 
@@ -58,15 +58,15 @@ macro_rules! impl_getset {
 
 impl_sync!(
     WaveSource,
-    /// Calculate the complex sound wave propagation
+    /// Get directivity
     ///
     /// # Arguments
     ///
-    /// * `x` - Target position
-    fn propagate(&self, x: Vector3) -> Complex;,
-    getset!((setter = set_sound_speed), Float);,
-    getset!((getter = wavenumber), Float);,
+    /// * `theta` - angle
+    fn directivity(theta: Float) -> Float;,
+    getset!((getter = frequency), Float);,
     getset!((getter = position, setter = set_position), Vector3);,
+    getset!((getter = direction, setter = set_direction), Vector3);,
     getset!((getter = phase, setter = set_phase), Float);,
     getset!((getter = amp, setter = set_amp), Float);
 );

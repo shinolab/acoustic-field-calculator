@@ -25,5 +25,5 @@ function GetVersion([string]$path) {
 
 $version = GetVersion("$PSScriptRoot/acoustic-field-calculator/Cargo.toml")
 cargo build --lib --release 
-md $PSScriptRoot/python/afc/bin -ea 0
-cp $PSScriptRoot/target/release/afccapi.dll $PSScriptRoot/python/afc/bin/afccapi-$version.dll
+mkdir $PSScriptRoot/python/afc/bin -ea 0
+Copy-Item $PSScriptRoot/target/release/afccapi.dll $PSScriptRoot/python/afc/bin/afccapi-$version.dll

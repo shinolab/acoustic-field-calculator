@@ -1,34 +1,53 @@
 /*
- * File: traits.rs
- * Project: field_type
- * Created Date: 18/09/2020
- * Author: Shun Suzuki
- * -----
- * Last Modified: 25/09/2020
+* File: traits.rs
+* Project: field_type
+* Created Date: 18/09/2020
+* Author: Shun Suzuki
+* -----
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::calculator::*;
-use crate::observe_area::*;
-use crate::wave_sources::*;
+use crate::{
+    core::{Complex, Float},
+    na::ComplexField,
+};
 
-pub trait FieldBuffer<D> {
-    fn buffer(&self) -> &[D];
-    fn buffer_mut(&mut self) -> &mut Vec<D>;
+pub trait FieldBuffer<T> {
+    fn buffer(&self) -> &[T];
+    fn buffer_mut(&mut self) -> &mut Vec<T>;
+    fn calc_from_complex_pressure(cp: Complex) -> T;
 }
 
-/// Calculate field by normal calculator
-pub trait FieldBufferCalculable<D>: FieldBuffer<D> {
-    fn calculate_field<S: WaveSource, F: ObserveArea>(
-        &mut self,
-        calculator: &CpuCalculator<S>,
-        field_buffer: &F,
-    );
+pub trait ScalarFieldBuffer<T>: FieldBuffer<T> {
+    fn max_result(&self) -> T;
 }
 
-pub trait ScalarFieldBuffer<D>: FieldBuffer<D> {
-    fn max(&self) -> D;
+impl<T> ScalarFieldBuffer<Float> for T
+where
+    T: FieldBuffer<Float>,
+{
+    fn max_result(&self) -> Float {
+        self.buffer().iter().fold(Float::NAN, |m, v| v.max(m))
+    }
+}
+
+impl<T> ScalarFieldBuffer<Complex> for T
+where
+    T: FieldBuffer<Complex>,
+{
+    fn max_result(&self) -> Complex {
+        self.buffer()
+            .iter()
+            .fold(Complex::new(Float::NAN, Float::NAN), |m, &v| -> Complex {
+                if v.abs() < m.abs() {
+                    m
+                } else {
+                    v
+                }
+            })
+    }
 }

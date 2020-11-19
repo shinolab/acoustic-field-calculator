@@ -4,18 +4,20 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 02/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
+
 use super::traits::*;
-use crate::field_buffer::PowerField;
-use crate::gpu::gpu_prelude::*;
-use crate::gpu::*;
-use crate::Vector3;
-use crate::{calculator::*, field_buffer::FieldBuffer};
+use crate::{
+    core::{wave_sources::WaveSource, Vector3},
+    field_buffer::PowerField,
+    gpu::gpu_prelude::*,
+    gpu::*,
+};
 
 use mut_static::MutStatic;
 
@@ -40,22 +42,27 @@ struct Config {
     _dummy3: u32,
 }
 
-impl GpuFieldBuffer for PowerField<f32> {
-    fn calculate_field<S: GpuWaveSource, F: SizedArea>(
-        &mut self,
-        calculator: &mut GpuCalculator<S>,
-        observe_area: &F,
+impl GpuFieldBuffer<f32> for PowerField {
+    fn calculate_field<
+        S: WaveSource,
+        M: GpuPropagationMedium<S>,
+        F: GpuFieldBuffer<f32>,
+        A: SizedArea,
+    >(
+        medium: &M,
+        observe_area: &A,
+        buffer: &mut F,
         device: GpuDevice,
         queue: GpuQueue,
     ) {
-        let len = observe_area.observe_points().len();
+        let len = observe_area.points().len();
         GPU_CACHE
             .write()
             .unwrap()
             .update_cache(len, device.clone(), observe_area);
 
-        let sources = calculator.wave_sources();
-        let directivity = S::directivity();
+        let sources = medium.wave_sources();
+        let directivity = medium.directivities();
         let directivity_len = directivity.len();
         let (num_x, num_y, num_z) = observe_area.size();
         let config_buffer = {
@@ -108,27 +115,28 @@ impl GpuFieldBuffer for PowerField<f32> {
             CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, pos).unwrap()
         };
 
+        let wavenums = medium.wavenums();
         let wavenum_buffer = {
             let pos = (0..to_four_multiple(sources.len())).map(|n| {
                 if n < sources.len() {
-                    sources[n].wavenumber() as f32
+                    wavenums[n] as f32
                 } else {
                     Default::default()
                 }
             });
             CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, pos).unwrap()
         };
+        let attens = medium.attenuations();
         let atten_buffer = {
             let pos = (0..to_four_multiple(sources.len())).map(|n| {
                 if n < sources.len() {
-                    sources[n].attenuation() as f32
+                    attens[n] as f32
                 } else {
                     Default::default()
                 }
             });
             CpuAccessibleBuffer::from_iter(device.clone(), BufferUsage::all(), false, pos).unwrap()
         };
-
         let source_phase_buffer = {
             let pos = (0..to_four_multiple(sources.len())).map(|n| {
                 if n < sources.len() {
@@ -234,8 +242,8 @@ impl GpuFieldBuffer for PowerField<f32> {
 
         let data_buffer_content = res_buffer.read().unwrap();
 
-        let buffer = self.buffer_mut();
-        buffer.resize(observe_area.observe_points().len(), Default::default());
-        buffer[0..len].copy_from_slice(&data_buffer_content[0..len]);
+        let results = buffer.buffer_mut();
+        results.resize(len, Default::default());
+        results[0..len].copy_from_slice(&data_buffer_content[0..len]);
     }
 }

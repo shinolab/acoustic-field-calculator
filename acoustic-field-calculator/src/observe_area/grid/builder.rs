@@ -4,20 +4,15 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use super::bounds::Bounds;
-use super::dimension::Axis;
-use super::*;
-use crate::core::Float;
-use crate::Vector3;
-
-use typenum::{N1, N2, N3};
+use super::{bounds::Bounds, dimension::Axis, *};
+use crate::core::{Float, Vector3};
 
 use std::marker::PhantomData;
 use std::mem::transmute;
@@ -53,6 +48,12 @@ impl GridAreaBuilder<Empty, Empty, Empty, Empty> {
             z_range_state: PhantomData,
             resolution_state: PhantomData,
         }
+    }
+}
+
+impl Default for GridAreaBuilder<Empty, Empty, Empty, Empty> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -193,7 +194,7 @@ impl_2d!(Used, Unused, Used);
 impl GridAreaBuilder<Used, Used, Used, Used> {
     /// Generate three-dimensional GridArea.
     /// You must specify the observation range/point on all axes and resolution before
-    pub fn generate(self) -> GridArea<N3> {
+    pub fn generate(&self) -> GridArea<N3> {
         let nx = ((self.x_range.1 - self.x_range.0) / self.resolution) as usize + 1;
         let ny = ((self.y_range.1 - self.y_range.0) / self.resolution) as usize + 1;
         let nz = ((self.z_range.1 - self.z_range.0) / self.resolution) as usize + 1;
@@ -204,11 +205,5 @@ impl GridAreaBuilder<Used, Used, Used, Used> {
             origin,
             self.resolution,
         )
-    }
-}
-
-impl Default for GridAreaBuilder<Empty, Empty, Empty, Empty> {
-    fn default() -> Self {
-        Self::new()
     }
 }

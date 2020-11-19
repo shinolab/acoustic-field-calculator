@@ -140,3 +140,4 @@ cython_debug/
 *.pdf
 .vscode/
 *.png
+*.dll

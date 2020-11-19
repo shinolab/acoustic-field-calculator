@@ -4,26 +4,24 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 28/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
+use acoustic_field_calculator::calculator::FieldCalculator;
 use acoustic_field_calculator::prelude::*;
-use acoustic_field_calculator::Float;
-use acoustic_field_calculator::*;
 
 const NUM_TRANS_X: usize = 18;
 const NUM_TRANS_Y: usize = 14;
-const TRANS_SIZE: Float = 10.18;
-const FREQUENCY: Float = 40e3;
-const SOUND_SPEED: Float = 340e3;
-const WAVE_LENGTH: Float = SOUND_SPEED / FREQUENCY;
+const TRANS_SIZE: Float = 10.18; // mm
+const FREQUENCY: Float = 40e3; // Hz
+const TEMPERATURE: Float = 300.0; // K
 
 macro_rules! write_image {
-    ($filename: tt, $field: ident, $bb: ident) => {{
+    ($filename: tt, $buffer: ident, $bb: ident) => {{
         use image::png::PngEncoder;
         use image::ColorType;
         use scarlet::colormap::ListedColorMap;
@@ -32,8 +30,8 @@ macro_rules! write_image {
         let colormap = ListedColorMap::magma();
 
         let output = File::create($filename).unwrap();
-        let max = $field.max() as Float;
-        let pixels: Vec<_> = $field
+        let max = $buffer.max_result() as Float;
+        let pixels: Vec<_> = $buffer
             .buffer()
             .chunks_exact($bb.0)
             .rev()
@@ -51,56 +49,43 @@ macro_rules! write_image {
     }};
 }
 
+#[cfg(feature = "gpu")]
+type Calculator = GpuCalculator;
+#[cfg(all(not(feature = "gpu"), feature = "accurate"))]
+type Calculator = AccurateCalculator;
+#[cfg(all(not(feature = "gpu"), not(feature = "accurate")))]
+type Calculator = CpuCalculator;
+
 fn main() {
     let array_center = Vector3::new(
         TRANS_SIZE * (NUM_TRANS_X - 1) as Float / 2.0,
         TRANS_SIZE * (NUM_TRANS_Y - 1) as Float / 2.0,
         0.,
     );
-
     let z = 150.0;
     let focal_pos = array_center + z * Vector3::z();
 
-    let mut calculator = {
-        #[cfg(not(feature = "gpu"))]
-        {
-            #[cfg(feature = "accurate")]
-            {
-                println!("Accurate mode");
-                CalculatorBuilder::new()
-                    .set_sound_speed(SOUND_SPEED)
-                    .set_accurate()
-                    .generate()
-            }
-            #[cfg(not(feature = "accurate"))]
-            {
-                println!("Normal mode");
-                CalculatorBuilder::new()
-                    .set_sound_speed(SOUND_SPEED)
-                    .generate()
-            }
-        }
-        #[cfg(feature = "gpu")]
-        {
-            println!("GPU mode");
-            CalculatorBuilder::new()
-                .set_sound_speed(SOUND_SPEED)
-                .gpu_enable()
-                .generate()
-        }
-    };
+    // UniformSystem is a uniform medium of sound
+    let mut system = UniformSystem::new(TEMPERATURE);
+    println!("{}", system.info());
 
+    // Placing sound sources which produce focus at 'focal_pos'
+    let sound_speed = system.sound_speed();
     let amp = 1.0;
+    let dir = Vector3::z();
     for y in 0..NUM_TRANS_Y {
         for x in 0..NUM_TRANS_X {
             let pos = Vector3::new(TRANS_SIZE * x as Float, TRANS_SIZE * y as Float, 0.);
             let d = (pos - focal_pos).norm();
-            let phase = (d % WAVE_LENGTH) / WAVE_LENGTH;
+            let wavelength = sound_speed / FREQUENCY;
+            let phase = (d % wavelength) / wavelength;
             let phase = -2.0 * PI * phase;
-            calculator.add_wave_source(T4010A1::new(pos, Vector3::z(), amp, phase, FREQUENCY));
+            system.add_wave_source(T4010A1::new(pos, dir, amp, phase, FREQUENCY));
         }
     }
+    println!("{}", system.info_of_source(0));
 
+    // Generating observe range and type
     let r = 100.0;
     let area = GridAreaBuilder::new()
         .x_range(array_center[0] - r / 2.0, array_center[0] + r / 2.0)
@@ -108,31 +93,34 @@ fn main() {
         .z_at(z)
         .resolution(1.)
         .generate();
+    let mut buffer = PressureField::new();
 
-    let mut field = PressureField::new();
-
+    // Calculation
+    let calculator = Calculator::new();
     let start = std::time::Instant::now();
-    calculator.calculate(&area, &mut field);
+    calculator.calculate(&system, &area, &mut buffer);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
     );
 
+    // Print to png image
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("xy.png", field, bb);
+    write_image!("xy.png", buffer, bb);
 
-    /////////////////////////////////////////////////////////////////////
+    ////////////////////// Moving focus ///////////////////////////////
     let focal_pos = focal_pos + Vector3::new(20., 20., 0.);
-    for source in calculator.wave_sources_mut() {
-        let d = (source.pos - focal_pos).norm();
-        let phase = (d % WAVE_LENGTH) / WAVE_LENGTH;
+    for wave_source in system.wave_sources_mut() {
+        let d = (wave_source.position() - focal_pos).norm();
+        let wavelength = sound_speed / FREQUENCY;
+        let phase = (d % wavelength) / wavelength;
         let phase = -2.0 * PI * phase;
-        source.phase = phase;
+        wave_source.set_phase(phase);
     }
 
     let start = std::time::Instant::now();
-    calculator.calculate(&area, &mut field);
+    calculator.calculate(&system, &area, &mut buffer);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
@@ -140,5 +128,5 @@ fn main() {
 
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("xy2.png", field, bb);
+    write_image!("xy2.png", buffer, bb);
 }

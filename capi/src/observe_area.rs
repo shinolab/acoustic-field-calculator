@@ -4,15 +4,14 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 21/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use acoustic_field_calculator::gpu::*;
-use acoustic_field_calculator::observe_area::grid::*;
+use acoustic_field_calculator::observe_area::{grid::*, *};
 use acoustic_field_calculator::prelude::*;
 
 use std::ffi::c_void;
@@ -28,16 +27,16 @@ pub unsafe extern "C" fn AFC_CreateScatterArea(out: *mut *mut c_void) {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn AFC_FreeScatterArea(handle: *mut c_void) {
-    let _area: Box<ScatterArea> = Box::from_raw(handle as *mut _);
-}
-
-#[no_mangle]
 #[allow(improper_ctypes_definitions)]
 pub unsafe extern "C" fn AFC_ScatterAddObservePoint(handle: *mut c_void, p: Vector3) {
     let mut area: Box<ScatterArea> = Box::from_raw(handle as *mut _);
     area.add_observe_point(p);
     forget(area);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn AFC_FreeScatterArea(handle: *mut c_void) {
+    let _area: Box<ScatterArea> = Box::from_raw(handle as *mut _);
 }
 
 #[no_mangle]

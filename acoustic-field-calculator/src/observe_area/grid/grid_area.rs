@@ -4,20 +4,22 @@
  * Created Date: 05/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 25/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use super::bounds::Bounds;
-use super::dimension::{Axis, Dimension};
-use crate::core::Float;
-use crate::observe_area::traits::*;
-use crate::Vector3;
-
-pub use typenum::{N1, N2, N3};
+use super::{
+    bounds::Bounds,
+    dimension::{Axis, Dimension},
+    *,
+};
+use crate::{
+    core::{Float, Vector3},
+    observe_area::ObserveArea,
+};
 
 use std::marker::PhantomData;
 
@@ -35,7 +37,7 @@ impl<D> GridArea<D> {
         bounds: Bounds,
         observe_points: Vec<Vector3>,
     ) -> GridArea<N> {
-        GridArea::<N> {
+        GridArea {
             dimension,
             bounds,
             observe_points,
@@ -227,7 +229,7 @@ impl GridArea<N3> {
 }
 
 impl<D> ObserveArea for GridArea<D> {
-    fn observe_points(&self) -> &Vec<Vector3> {
+    fn points(&self) -> &[Vector3] {
         &self.observe_points
     }
 }

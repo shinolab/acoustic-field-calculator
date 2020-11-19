@@ -4,28 +4,23 @@
  * Created Date: 27/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 03/10/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::Float;
-use crate::Optimizer;
-use crate::WaveSource;
-use crate::{Complex, Vector3};
+use crate::multiple_foci::macros::*;
+use crate::*;
 
-use na::{ComplexField, Dynamic, Matrix, VecStorage, U1};
 use rand::{thread_rng, Rng};
-
-type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
-type VectorXcf = Matrix<Complex, Dynamic, U1, VecStorage<Complex, Dynamic, U1>>;
 
 const REPEAT_SDP: usize = 100;
 const LAMBDA_SDP: Float = 0.8;
 const TIKHONOV_DEFAULT: Float = 1e-5;
 
+/// Inoue et al., 2015
 pub struct Horn {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
@@ -75,27 +70,14 @@ fn pseudo_inverse_with_reg(m: &MatrixXcf, alpha: Float) -> MatrixXcf {
 impl Optimizer for Horn {
     #[allow(clippy::many_single_char_names)]
     #[allow(non_snake_case)]
-    fn optimize<S: WaveSource>(&self, wave_sources: &mut [S]) {
-        for source in wave_sources.iter_mut() {
+    fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {
+        for source in system.wave_sources_mut() {
             source.set_phase(0.);
         }
 
         let m = self.foci.len();
-        let n = wave_sources.len();
 
-        let G = MatrixXcf::from_iterator(
-            m,
-            n,
-            wave_sources
-                .iter()
-                .map(|source| {
-                    self.foci
-                        .iter()
-                        .map(|&fp| source.propagate(fp))
-                        .collect::<Vec<_>>()
-                })
-                .flatten(),
-        );
+        let G = generate_propagation_matrix(system, &self.foci);
         let P = MatrixXcf::from_diagonal(&VectorXcf::from_iterator(
             m,
             self.amps.iter().map(|&a| Complex::new(a, 0.)),
@@ -138,7 +120,7 @@ impl Optimizer for Horn {
         let u = eig.eigenvectors.column(eig.eigenvalues.imax());
         let q = G_pinv * P * u;
         let max_coeff = q.camax();
-        for (wave_source, qe) in wave_sources.iter_mut().zip(q.iter()) {
+        for (wave_source, qe) in system.wave_sources_mut().iter_mut().zip(q.iter()) {
             let amp = wave_source.amp() * qe.abs() / max_coeff;
             let phase = qe.argument();
             wave_source.set_amp(amp);

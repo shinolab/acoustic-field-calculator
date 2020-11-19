@@ -1,6 +1,6 @@
 [package]
 name = "capi"
-version = "0.5.5"
+version = "0.6.0"
 authors = ["suzuki_hapis <suzuki@hapis.k.u-tokyo.ac.jp>"]
 edition = "2018"
 
@@ -9,7 +9,7 @@ edition = "2018"
 [lib]
 name = "afccapi"
 path = "src/lib.rs"
-crate-type = ["staticlib", "cdylib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 libc = "0.2"

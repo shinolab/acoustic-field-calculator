@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 22/09/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -17,4 +17,6 @@ pub mod grid;
 pub mod scatter;
 mod traits;
 
-pub use traits::ObserveArea;
+pub use grid::{GridArea, GridAreaBuilder};
+pub use scatter::ScatterArea;
+pub use traits::*;
