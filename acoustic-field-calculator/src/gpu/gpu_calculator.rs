@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -41,20 +41,20 @@ impl GpuCalculator {
     /// * `field` - Field to calculate
     ///
     pub fn calculate<
-        'a,
         S: WaveSource,
         M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
         T,
-        F: GpuFieldType<T>,
-        A: SizedArea<T, F>,
+        F: GpuFieldBuffer<T>,
+        A: SizedArea,
     >(
         &self,
-        medium: &'a M,
-        observe_area: &'a mut A,
+        medium: &M,
+        observe_area: &A,
+        buffer: &mut F,
     ) {
         let device = self.device.clone();
         let queue = self.queue.clone();
-        F::calculate_field(medium, observe_area, device, queue);
+        F::calculate_field(medium, observe_area, buffer, device, queue);
     }
 
     fn init_gpu() -> (Arc<Device>, Arc<Queue>) {

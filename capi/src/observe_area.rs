@@ -11,73 +11,32 @@
  *
  */
 
-use acoustic_field_calculator::field_type::*;
-use acoustic_field_calculator::observe_area::builder::Empty;
-use acoustic_field_calculator::observe_area::{grid::*, scatter::ScatterArea, ScatterAreaBuilder};
+use acoustic_field_calculator::observe_area::{grid::*, *};
 use acoustic_field_calculator::prelude::*;
 
 use std::ffi::c_void;
 use std::mem::forget;
 
-use crate::type_inference_aux::FieldTypes;
-
-macro_rules! fields {
-    ($macro: tt) => {
-        $macro!(PressureField, PowerField, ComplexPressureField)
-    };
-}
-
 #[no_mangle]
-pub unsafe extern "C" fn AFC_CreateScatterArea(out: *mut *mut c_void, field_type: i32) {
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let area = ScatterAreaBuilder::<$field_type>::new().generate();
-                    let mut area = Box::new(area);
-                    let ptr = area.as_mut() as *mut _;
-                    forget(area);
-                    *out = ptr as *mut _;
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+pub unsafe extern "C" fn AFC_CreateScatterArea(out: *mut *mut c_void) {
+    let area = ScatterArea::new();
+    let mut area = Box::new(area);
+    let ptr = area.as_mut() as *mut _;
+    forget(area);
+    *out = ptr as *mut _;
 }
 
 #[no_mangle]
 #[allow(improper_ctypes_definitions)]
-pub unsafe extern "C" fn AFC_ScatterAddObservePoint(
-    handle: *mut c_void,
-    p: Vector3,
-    field_type: i32,
-) {
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let mut area : Box<ScatterArea<$field_type>> = Box::from_raw(handle as *mut _);
-                    area.add_observe_point(p);
-                    forget(area);
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+pub unsafe extern "C" fn AFC_ScatterAddObservePoint(handle: *mut c_void, p: Vector3) {
+    let mut area: Box<ScatterArea> = Box::from_raw(handle as *mut _);
+    area.add_observe_point(p);
+    forget(area);
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn AFC_FreeScatterArea(handle: *mut c_void, field_type: i32) {
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let _area : Box<ScatterArea<$field_type>> = Box::from_raw(handle as *mut _);
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+pub unsafe extern "C" fn AFC_FreeScatterArea(handle: *mut c_void) {
+    let _area: Box<ScatterArea> = Box::from_raw(handle as *mut _);
 }
 
 #[no_mangle]
@@ -91,16 +50,16 @@ pub unsafe extern "C" fn AFC_CreateGridArea1D(
     first_axis: i32,
     second_axis: i32,
     third_axis: i32,
-    field_type: i32,
 ) {
     let first_axis = Axis::from_i32(first_axis);
     let second_axis = Axis::from_i32(second_axis);
     let third_axis = Axis::from_i32(third_axis);
+    let builder = GridAreaBuilder::new();
     macro_rules! gen_match {
-        ($builder:ident,($([($f:ident, $fg:ident),($s:ident, $sg:ident), ($t:ident, $tg:ident)]),*)) => {
+        ($([($f:ident, $fg:ident),($s:ident, $sg:ident), ($t:ident, $tg:ident)]),*) => {
             match (first_axis, second_axis, third_axis) {
                 $((Axis::$f, Axis::$s, Axis::$t) =>
-                    $builder
+                    builder
                     .$fg(first_start, first_end)
                     .$sg(second)
                     .$tg(third)
@@ -111,28 +70,18 @@ pub unsafe extern "C" fn AFC_CreateGridArea1D(
             }
         }
     }
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let builder = ObserveAreaBuilder::<Empty, $field_type>::new().grid();
-                    let area = gen_match!(
-                        builder,
-                        ([(X, x_range), (Y, y_at), (Z, z_at)],
-                        [(X, x_range), (Z, z_at), (Y, y_at)],
-                        [(Y, y_range), (Z, z_at), (X, x_at)],
-                        [(Y, y_range), (X, x_at), (Z, z_at)],
-                        [(Z, z_range), (X, x_at), (Y, y_at)],
-                        [(Z, z_range), (Y, y_at), (X, x_at)]));
-                    let mut area = Box::new(area);
-                    let ptr = area.as_mut() as *mut _;
-                    forget(area);
-                    *out = ptr as *mut _;
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+    let area = gen_match!(
+        [(X, x_range), (Y, y_at), (Z, z_at)],
+        [(X, x_range), (Z, z_at), (Y, y_at)],
+        [(Y, y_range), (Z, z_at), (X, x_at)],
+        [(Y, y_range), (X, x_at), (Z, z_at)],
+        [(Z, z_range), (X, x_at), (Y, y_at)],
+        [(Z, z_range), (Y, y_at), (X, x_at)]
+    );
+    let mut area = Box::new(area);
+    let ptr = area.as_mut() as *mut _;
+    forget(area);
+    *out = ptr as *mut _;
 }
 
 #[no_mangle]
@@ -147,16 +96,16 @@ pub unsafe extern "C" fn AFC_CreateGridArea2D(
     first_axis: i32,
     second_axis: i32,
     third_axis: i32,
-    field_type: i32,
 ) {
     let first_axis = Axis::from_i32(first_axis);
     let second_axis = Axis::from_i32(second_axis);
     let third_axis = Axis::from_i32(third_axis);
+    let builder = GridAreaBuilder::new();
     macro_rules! gen_match {
-        ($builder:ident,($([($f:ident, $fg:ident),($s:ident, $sg:ident), ($t:ident, $tg:ident)]),*)) => {
+        ($([($f:ident, $fg:ident),($s:ident, $sg:ident), ($t:ident, $tg:ident)]),*) => {
             match (first_axis, second_axis, third_axis) {
                 $((Axis::$f, Axis::$s, Axis::$t) =>
-                    $builder
+                    builder
                     .$fg(first_start, first_end)
                     .$sg(second_start, second_end)
                     .$tg(third)
@@ -167,28 +116,18 @@ pub unsafe extern "C" fn AFC_CreateGridArea2D(
             }
         }
     }
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let builder = ObserveAreaBuilder::<Empty, $field_type>::new().grid();
-                    let area = gen_match!(
-                        builder,
-                        ([(X, x_range), (Y, y_range), (Z, z_at)],
-                        [(X, x_range), (Z, z_range), (Y, y_at)],
-                        [(Y, y_range), (Z, z_range), (X, x_at)],
-                        [(Y, y_range), (X, x_range), (Z, z_at)],
-                        [(Z, z_range), (X, x_range), (Y, y_at)],
-                        [(Z, z_range), (Y, y_range), (X, x_at)]));
-                    let mut area = Box::new(area);
-                    let ptr = area.as_mut() as *mut _;
-                    forget(area);
-                    *out = ptr as *mut _;
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+    let area = gen_match!(
+        [(X, x_range), (Y, y_range), (Z, z_at)],
+        [(X, x_range), (Z, z_range), (Y, y_at)],
+        [(Y, y_range), (Z, z_range), (X, x_at)],
+        [(Y, y_range), (X, x_range), (Z, z_at)],
+        [(Z, z_range), (X, x_range), (Y, y_at)],
+        [(Z, z_range), (Y, y_range), (X, x_at)]
+    );
+    let mut area = Box::new(area);
+    let ptr = area.as_mut() as *mut _;
+    forget(area);
+    *out = ptr as *mut _;
 }
 
 #[no_mangle]
@@ -204,16 +143,16 @@ pub unsafe extern "C" fn AFC_CreateGridArea3D(
     first_axis: i32,
     second_axis: i32,
     third_axis: i32,
-    field_type: i32,
 ) {
     let first_axis = Axis::from_i32(first_axis);
     let second_axis = Axis::from_i32(second_axis);
     let third_axis = Axis::from_i32(third_axis);
+    let builder = GridAreaBuilder::new();
     macro_rules! gen_match {
-        ($builder:ident,($([($f:ident, $fg:ident),($s:ident, $sg:ident), ($t:ident, $tg:ident)]),*)) => {
+        ($([($f:ident, $fg:ident),($s:ident, $sg:ident), ($t:ident, $tg:ident)]),*) => {
             match (first_axis, second_axis, third_axis) {
                 $((Axis::$f, Axis::$s, Axis::$t) =>
-                    $builder
+                    builder
                     .$fg(first_start, first_end)
                     .$sg(second_start, second_end)
                     .$tg(third_start, third_end)
@@ -224,53 +163,34 @@ pub unsafe extern "C" fn AFC_CreateGridArea3D(
             }
         }
     }
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let builder = ObserveAreaBuilder::<Empty, $field_type>::new().grid();
-                    let area = gen_match!(
-                        builder,
-                        ([(X, x_range), (Y, y_range), (Z, z_range)],
-                        [(X, x_range), (Z, z_range), (Y, y_range)],
-                        [(Y, y_range), (Z, z_range), (X, x_range)],
-                        [(Y, y_range), (X, x_range), (Z, z_range)],
-                        [(Z, z_range), (X, x_range), (Y, y_range)],
-                        [(Z, z_range), (Y, y_range), (X, x_range)]));
-                    let mut area = Box::new(area);
-                    let ptr = area.as_mut() as *mut _;
-                    forget(area);
-                    *out = ptr as *mut _;
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+    let area = gen_match!(
+        [(X, x_range), (Y, y_range), (Z, z_range)],
+        [(X, x_range), (Z, z_range), (Y, y_range)],
+        [(Y, y_range), (Z, z_range), (X, x_range)],
+        [(Y, y_range), (X, x_range), (Z, z_range)],
+        [(Z, z_range), (X, x_range), (Y, y_range)],
+        [(Z, z_range), (Y, y_range), (X, x_range)]
+    );
+    let mut area = Box::new(area);
+    let ptr = area.as_mut() as *mut _;
+    forget(area);
+    *out = ptr as *mut _;
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn AFC_FreeGridArea(handle: *mut c_void, dimension: i32, field_type: i32) {
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    match dimension {
-                        1 => {
-                            let _area: Box<GridArea<N1, $field_type>> = Box::from_raw(handle as *mut _);
-                        }
-                        2 => {
-                            let _area: Box<GridArea<N2, $field_type>> = Box::from_raw(handle as *mut _);
-                        }
-                        3 => {
-                            let _area: Box<GridArea<N3, $field_type>> = Box::from_raw(handle as *mut _);
-                        }
-                        _ => unreachable!(),
-                    };
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+pub unsafe extern "C" fn AFC_FreeGridArea(handle: *mut c_void, dimension: i32) {
+    match dimension {
+        1 => {
+            let _area: Box<GridArea<N1>> = Box::from_raw(handle as *mut _);
+        }
+        2 => {
+            let _area: Box<GridArea<N2>> = Box::from_raw(handle as *mut _);
+        }
+        3 => {
+            let _area: Box<GridArea<N3>> = Box::from_raw(handle as *mut _);
+        }
+        _ => unreachable!(),
+    };
 }
 
 #[no_mangle]
@@ -282,37 +202,28 @@ pub unsafe extern "C" fn AFC_GetGridSize(
     third: *mut u32,
     field_type: i32,
 ) {
-    macro_rules! gen_match_field_type {
-        ($($field_type:ident),*) => {
-            match FieldTypes::from_i32(field_type) {
-                $(FieldTypes::$field_type => {
-                    let bb = match dimension {
-                        1 => {
-                            let area: Box<GridArea<N1,$field_type>> = Box::from_raw(handle as *mut _);
-                            let bb = area.size();
-                            forget(area);
-                            bb
-                        }
-                        2 => {
-                            let area: Box<GridArea<N2,$field_type>> = Box::from_raw(handle as *mut _);
-                            let bb = area.size();
-                            forget(area);
-                            bb
-                        }
-                        3 => {
-                            let area: Box<GridArea<N3,$field_type>> = Box::from_raw(handle as *mut _);
-                            let bb = area.size();
-                            forget(area);
-                            bb
-                        }
-                        _ => unreachable!(),
-                    };
-                    *first = bb.0;
-                    *second = bb.1;
-                    *third = bb.2;
-                },)*
-            }
-        };
-    }
-    fields!(gen_match_field_type)
+    let bb = match dimension {
+        1 => {
+            let area: Box<GridArea<N1>> = Box::from_raw(handle as *mut _);
+            let bb = area.size();
+            forget(area);
+            bb
+        }
+        2 => {
+            let area: Box<GridArea<N2>> = Box::from_raw(handle as *mut _);
+            let bb = area.size();
+            forget(area);
+            bb
+        }
+        3 => {
+            let area: Box<GridArea<N3>> = Box::from_raw(handle as *mut _);
+            let bb = area.size();
+            forget(area);
+            bb
+        }
+        _ => unreachable!(),
+    };
+    *first = bb.0;
+    *second = bb.1;
+    *third = bb.2;
 }

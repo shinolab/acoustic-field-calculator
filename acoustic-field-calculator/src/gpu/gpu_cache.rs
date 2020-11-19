@@ -4,7 +4,7 @@
  * Created Date: 20/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -41,7 +41,7 @@ macro_rules! gen_cache {
                 }
             }
 
-            pub fn update_cache<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
+            pub fn update_cache<A: SizedArea>(
                 &mut self,
                 len: usize,
                 device: GpuDevice,
@@ -60,7 +60,7 @@ macro_rules! gen_cache {
                 }
             }
 
-            fn initialize_cache<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
+            fn initialize_cache<A: SizedArea>(
                 &mut self,
                 len: usize,
                 device: GpuDevice,
@@ -71,12 +71,7 @@ macro_rules! gen_cache {
                 self.device = Some(device);
             }
 
-            fn update<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
-                &mut self,
-                len: usize,
-                device: GpuDevice,
-                observe_area: &A,
-            ) {
+            fn update<A: SizedArea>(&mut self, len: usize, device: GpuDevice, observe_area: &A) {
                 let obs_points = observe_area.points();
                 let (current_obs_p, current_obs_len) = &self.obs_points;
                 let current_obs_p = current_obs_p.load(Ordering::Acquire);
@@ -100,7 +95,7 @@ macro_rules! gen_cache {
                 self.pipeline = Some(pipeline);
             }
 
-            fn init_observe_area<T, F: GpuFieldType<T>, A: SizedArea<T, F>>(
+            fn init_observe_area<A: SizedArea>(
                 &mut self,
                 observe_area: &A,
                 len: usize,

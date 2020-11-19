@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -14,7 +14,7 @@
 use super::traits::*;
 use crate::{
     core::{wave_sources::WaveSource, Complex, Vector3},
-    field_type::ComplexPressureField,
+    field_buffer::ComplexPressureField,
     gpu::gpu_prelude::*,
     gpu::*,
     system::WaveSourceContainer,
@@ -43,15 +43,16 @@ struct Config {
     _dummy3: u32,
 }
 
-impl GpuFieldType<Complex> for ComplexPressureField {
+impl GpuFieldBuffer<Complex> for ComplexPressureField {
     fn calculate_field<
         S: WaveSource,
         M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
-        F: GpuFieldType<Complex>,
-        A: SizedArea<Complex, F>,
+        F: GpuFieldBuffer<Complex>,
+        A: SizedArea,
     >(
         medium: &M,
-        observe_area: &mut A,
+        observe_area: &A,
+        buffer: &mut F,
         device: GpuDevice,
         queue: GpuQueue,
     ) {
@@ -242,7 +243,7 @@ impl GpuFieldType<Complex> for ComplexPressureField {
 
         let data_buffer_content = res_buffer.read().unwrap();
 
-        let results = observe_area.results_mut();
+        let results = buffer.buffer_mut();
         results.resize(len / 2, Default::default());
         unsafe {
             std::ptr::copy_nonoverlapping(

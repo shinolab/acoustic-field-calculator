@@ -35,15 +35,14 @@ impl CpuCalculator {
     /// * `field` - Field to calculate
     ///
     pub fn calculate<
-        'a,
         M: PropagationMedium,
         A: ObserveArea,
         O: Send + Sized + Default + Clone,
         F: FieldBuffer<O>,
     >(
         &self,
-        medium: &'a M,
-        observe_area: &'a A,
+        medium: &M,
+        observe_area: &A,
         buffer: &mut F,
     ) {
         let obs_points = observe_area.points();

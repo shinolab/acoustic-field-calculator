@@ -4,7 +4,7 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -23,7 +23,7 @@ const FREQUENCY: Float = 40e3; // Hz
 const TEMPERATURE: Float = 300.0; // K
 
 macro_rules! write_image_xy {
-    ($filename: tt, $area: ident) => {{
+    ($filename: tt, $area: ident, $field: ident) => {{
         use image::png::PngEncoder;
         use image::ColorType;
         use scarlet::colormap::ListedColorMap;
@@ -35,9 +35,9 @@ macro_rules! write_image_xy {
         let colormap = ListedColorMap::magma();
 
         let output = File::create($filename).unwrap();
-        let max = $area.max_result() as Float;
-        let pixels: Vec<_> = $area
-            .results()
+        let max = $field.max_result() as Float;
+        let pixels: Vec<_> = $field
+            .buffer()
             .chunks_exact(bb.0)
             .rev()
             .flatten()
@@ -72,14 +72,13 @@ fn main() {
     }
 
     let r = 200.0;
-    let mut area = ObserveAreaBuilder::new()
-        .grid()
+    let area = GridAreaBuilder::new()
         .x_range(array_center[0] - r / 2.0, array_center[0] + r / 2.0)
         .y_range(array_center[1] - r / 2.0, array_center[1] + r / 2.0)
         .z_at(z)
         .resolution(1.)
-        .pressure()
         .generate();
+    let mut field = PressureField::new();
 
     let calculator = CpuCalculator::new();
 
@@ -101,8 +100,8 @@ fn main() {
 
             IFFT::new(path, bottom_left, top_left, bottom_right, TRANS_SIZE, z)
                 .optimize(&mut system);
-            calculator.calculate(&system, &mut area);
-            write_image_xy!("ifft_star.png", area);
+            calculator.calculate(&system, &area, &mut field);
+            write_image_xy!("ifft_star.png", area, field);
             break;
         }
     }
@@ -113,8 +112,8 @@ fn main() {
         source.set_amp(1.0);
     }
     Long::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("long.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("long.png", area, field);
 
     /////////////////////////////// HORN ///////////////////////////////
     // please specify maximum amplitude before
@@ -122,8 +121,8 @@ fn main() {
         source.set_amp(1.0);
     }
     Horn::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("horn.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("horn.png", area, field);
 
     /////////////////  Naive linear synthesis  /////////////////////////
     // please specify maximum amplitude before
@@ -131,8 +130,8 @@ fn main() {
         source.set_amp(1.0);
     }
     Naive::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("naive.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("naive.png", area, field);
 
     /////////////////  Gerchberg-Saxton  /////////////////////////
     // please specify maximum amplitude before
@@ -140,8 +139,8 @@ fn main() {
         source.set_amp(1.0);
     }
     GS::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("gs.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("gs.png", area, field);
 
     /////////////////  GS-PAT  /////////////////////////
     // please specify maximum amplitude before
@@ -149,8 +148,8 @@ fn main() {
         source.set_amp(1.0);
     }
     GSPAT::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("gs-pat.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("gs-pat.png", area, field);
 
     /////////////////  Gradient Descent  /////////////////////////
     // Gradient Descent optimizer currently does not support amplitudes
@@ -158,8 +157,8 @@ fn main() {
         source.set_amp(1.0);
     }
     GradientDescent::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("gradient.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("gradient.png", area, field);
 
     /////////////////  Gauss Newton  /////////////////////////
     // Gauss Newton optimizer currently does not support amplitudes
@@ -167,8 +166,8 @@ fn main() {
         source.set_amp(1.0);
     }
     GaussNewton::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("gauss-newton.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("gauss-newton.png", area, field);
 
     /////////////////  Levenberg-Marquardt  /////////////////////////
     // Levenberg-Marquardt optimizer currently does not support amplitudes
@@ -176,8 +175,8 @@ fn main() {
         source.set_amp(1.0);
     }
     LM::new(foci.clone(), amps.clone()).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("lm.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("lm.png", area, field);
 
     /////////////////  Acoustic Power Optimization  /////////////////////////
     // please specify maximum amplitude before
@@ -185,6 +184,6 @@ fn main() {
         source.set_amp(1.0);
     }
     APO::new(foci, amps, 2.0).optimize(&mut system);
-    calculator.calculate(&system, &mut area);
-    write_image_xy!("apo.png", area);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("apo.png", area, field);
 }

@@ -4,7 +4,7 @@
  * Created Date: 27/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -20,7 +20,7 @@ const FREQUENCY: Float = 40e3; // Hz
 const TEMPERATURE: Float = 300.0; // K
 
 macro_rules! write_image {
-    ($filename: tt, $area: ident, $bb: ident) => {{
+    ($filename: tt, $field: ident, $bb: ident) => {{
         use image::png::PngEncoder;
         use image::ColorType;
         use scarlet::colormap::ListedColorMap;
@@ -29,9 +29,9 @@ macro_rules! write_image {
         let colormap = ListedColorMap::magma();
 
         let output = File::create($filename).unwrap();
-        let max = $area.max_result() as Float;
-        let pixels: Vec<_> = $area
-            .results()
+        let max = $field.max_result() as Float;
+        let pixels: Vec<_> = $field
+            .buffer()
             .chunks_exact($bb.0)
             .rev()
             .flatten()
@@ -67,37 +67,34 @@ fn main() {
     FocalPoint::new(focal_pos).optimize(&mut system);
 
     let r = 100.0;
-    let mut area = ObserveAreaBuilder::new()
-        .grid()
+    let area = GridAreaBuilder::new()
         .x_range(array_center[0] - r / 2.0, array_center[0] + r / 2.0)
         .y_range(array_center[1] - r / 2.0, array_center[1] + r / 2.0)
         .z_at(z)
         .resolution(1.)
-        .pressure()
         .generate();
+    let mut field = PressureField::new();
 
     let calculator = CpuCalculator::new();
-    calculator.calculate(&system, &mut area);
+    calculator.calculate(&system, &area, &mut field);
 
     // Print to png image
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("focus.png", area, bb);
+    write_image!("focus.png", field, bb);
 
     /////////////////////////////// Bessel Beam ///////////////////////////////
 
     BesselBeam::new(array_center, Vector3::z(), 18.0 / 180.0 * PI).optimize(&mut system);
-    let mut area = ObserveAreaBuilder::new()
-        .grid()
+    let area = GridAreaBuilder::new()
         .x_range(array_center[0] - r, array_center[0] + r)
         .z_range(0., 500.)
         .y_at(array_center[1])
         .resolution(1.)
-        .pressure()
         .generate();
-    calculator.calculate(&system, &mut area);
+    calculator.calculate(&system, &area, &mut field);
 
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.z());
-    write_image!("bessel.png", area, bb);
+    write_image!("bessel.png", field, bb);
 }

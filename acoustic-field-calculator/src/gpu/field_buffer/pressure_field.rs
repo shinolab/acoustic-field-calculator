@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -14,7 +14,7 @@
 use super::traits::*;
 use crate::{
     core::{wave_sources::WaveSource, Vector3},
-    field_type::PressureField,
+    field_buffer::PressureField,
     gpu::gpu_prelude::*,
     gpu::*,
     system::WaveSourceContainer,
@@ -43,15 +43,16 @@ struct Config {
     _dummy3: u32,
 }
 
-impl GpuFieldType<f32> for PressureField {
+impl GpuFieldBuffer<f32> for PressureField {
     fn calculate_field<
         S: WaveSource,
         M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
-        F: GpuFieldType<f32>,
-        A: SizedArea<f32, F>,
+        F: GpuFieldBuffer<f32>,
+        A: SizedArea,
     >(
         medium: &M,
-        observe_area: &mut A,
+        observe_area: &A,
+        buffer: &mut F,
         device: GpuDevice,
         queue: GpuQueue,
     ) {
@@ -242,7 +243,7 @@ impl GpuFieldType<f32> for PressureField {
 
         let data_buffer_content = res_buffer.read().unwrap();
 
-        let results = observe_area.results_mut();
+        let results = buffer.buffer_mut();
         results.resize(len, Default::default());
         results[0..len].copy_from_slice(&data_buffer_content[0..len]);
     }
