@@ -7,8 +7,6 @@ This repository consists of the following four directories.
 [API Document](https://shinolab.github.io/acoustic-field-calculator/acoustic_field_calculator/index.html)
 
 This is the main library.
-This library provides fast sound field calculation by CPU parallelization.
-Also, in the case of a large scale, the GPGPU can be used to compute far faster.
 
 ## acoustic-field-optimizer
 
