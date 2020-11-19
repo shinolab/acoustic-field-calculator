@@ -12,6 +12,10 @@ Copyright (c) 2020 Hapis Lab. All rights reserved.
 '''
 
 import os.path
+import platform
+import requests
+import shutil
+
 
 from afc import plot_helper
 from .afc import UniformSystem
@@ -38,7 +42,31 @@ __all__ = [
     'plot_helper']
 
 _Version = '0.6.0'
+
+PLATFORM = platform.system()
+PREFIX = ''
+EXT = ''
+if PLATFORM == 'Windows':
+    EXT = '.dll'
+elif PLATFORM == 'Linux':
+    PREFIX = 'lib'
+    EXT = '.so'
+
 LIB_DIR_PATH = os.path.join(os.path.dirname(__file__), 'bin')
-LIB_PATH = os.path.join(LIB_DIR_PATH, 'afccapi.dll')
+LIB_PATH = os.path.join(LIB_DIR_PATH, PREFIX + 'afccapi-' + _Version + EXT)
+
+
+def download_bin():
+    if not os.path.isdir(LIB_DIR_PATH):
+        os.mkdir(LIB_DIR_PATH)
+    response = requests.get(f'https://github.com/shinolab/acoustic-field-calculator/releases/download/v{_Version}/{PREFIX}afccapi{EXT}', stream=True)
+    with open(LIB_PATH, 'wb') as fp:
+        shutil.copyfileobj(response.raw, fp)
+
+
+if not os.path.isfile(LIB_PATH):
+    print('Dll does not exist. Downloading latest version...')
+    download_bin()
+
 
 init_dll(LIB_PATH)
