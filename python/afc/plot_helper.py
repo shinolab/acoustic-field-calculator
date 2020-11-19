@@ -4,7 +4,7 @@ Project: afc
 Created Date: 09/05/2020
 Author: Shun Suzuki
 -----
-Last Modified: 01/10/2020
+Last Modified: 19/11/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -38,10 +38,10 @@ def add_colorbar(fig, axes, mappable, position='right', size='5%', pad='3%'):
 def plot_phase_2d(fig, axes, transducers, trans_size, cmap='jet', marker='o'):
     trans_x = list(map(lambda s: s.pos[0], transducers))
     trans_y = list(map(lambda s: s.pos[1], transducers))
-    trans_phase = list(map(lambda s: s.phase - math.pi, transducers))
+    trans_phase = list(map(lambda s: s.phase % (2 * math.pi), transducers))
 
     scat = axes.scatter(trans_x, trans_y, c=trans_phase, cmap=cmap, s=0,
-                        marker=marker, vmin=-math.pi, vmax=math.pi,
+                        marker=marker, vmin=0, vmax=2 * math.pi,
                         clip_on=False, linewidths=0)
 
     add_colorbar(fig, axes, scat)

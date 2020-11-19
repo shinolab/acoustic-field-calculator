@@ -28,11 +28,8 @@ if __name__ == '__main__':
     NUM_TRANS_X = 18
     NUM_TRANS_Y = 14
     TRANS_SIZE = 10.18
-
     FREQUENCY = 40e3
     TEMPERATURE = 300
-    SOUND_SPEED = 340e3
-    WAVE_LENGTH = SOUND_SPEED / FREQUENCY
     Z_DIR = np.array([0, 0, 1])
 
     array_center = np.array([TRANS_SIZE * (NUM_TRANS_X - 1) / 2.0, TRANS_SIZE * (NUM_TRANS_Y - 1) / 2.0, 0])
@@ -49,21 +46,29 @@ if __name__ == '__main__':
     for y in range(NUM_TRANS_Y):
         for x in range(NUM_TRANS_X):
             pos = np.array([TRANS_SIZE * x, TRANS_SIZE * y, 0.])
-            d = np.linalg.norm(pos - focal_pos)
-            phase = (d % WAVE_LENGTH) / WAVE_LENGTH
-            phase = -2.0 * math.pi * phase
-
-            # source = SphereWaveSource(pos, 1.0, phase, FREQUENCY)
-            source = T4010A1(pos, Z_DIR, 1.0, phase, FREQUENCY)
+            # source = SphereWaveSource(pos, 1.0, 0.0, FREQUENCY)
+            source = T4010A1(pos, Z_DIR, 1.0, 0.0, FREQUENCY)
             system.add_wave_source(source)
+
+    system.info()
+    system.info_of_source(0)
+
+    # set phase to produce focus
+    sound_speed = system.sound_speed()
+    for source in system.get_wave_sources():
+        d = np.linalg.norm(source.pos - focal_pos)
+        wavelength = sound_speed / FREQUENCY
+        phase = (d % wavelength) / wavelength
+        phase = -2.0 * math.pi * phase
+        source.phase = phase
 
     # # show phases
     # dpi = 72
     # fig = plt.figure(figsize=(6, 6), dpi=dpi)
     # axes = fig.add_subplot(111, aspect='equal')
-    # scat = plot_helper.plot_phase_2d(fig, axes, calculator.get_wave_sources(), TRANS_SIZE)
+    # scat = plot_helper.plot_phase_2d(fig, axes, system.get_wave_sources(), TRANS_SIZE)
     # plot_helper.add_colorbar(fig, axes, scat)
-    # plt.savefig('phase.pdf')
+    # plt.savefig('phase.png')
     # plt.show()
 
     # Observe properties, units are mm
@@ -98,5 +103,5 @@ if __name__ == '__main__':
     divider = mpl_toolkits.axes_grid1.make_axes_locatable(axes)
     cax = divider.append_axes('right', '5%', pad='3%')
     fig.colorbar(heat_map, cax=cax)
-    plt.savefig('xy.pdf')
+    plt.savefig('xy.png')
     plt.show()

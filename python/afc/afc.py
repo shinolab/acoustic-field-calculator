@@ -28,9 +28,9 @@ class Axis(IntEnum):
 
 
 class UniformSystem:
-    def __init__(self, sound_speed):
+    def __init__(self, temperature):
         self.handle = c_void_p()
-        self.sound_speed = sound_speed
+        self.temperature = temperature
         self._source_type = -1
 
     def __del__(self):
@@ -43,9 +43,25 @@ class UniformSystem:
     def __check_and_init(self, source):
         if self._source_type == -1:
             self._source_type = source.get_type()
-            nativemethods.AFC_DLL.AFC_CreateUniformSystem(byref(self.handle), self.sound_speed, self._source_type)
+            nativemethods.AFC_DLL.AFC_CreateUniformSystem(byref(self.handle), self.temperature, self._source_type)
         elif self._source_type != source.get_type():
             raise TypeError("Source type error! Mixing sound source types is not allowed.")
+
+    def sound_speed(self):
+        if self.handle:
+            return nativemethods.AFC_DLL.AFC_UniformSystemSoundSpeed(self.handle, self._source_type)
+        else:
+            raise TypeError("Please add sound source before.")
+
+    def info(self):
+        if self.handle:
+            info = nativemethods.AFC_DLL.AFC_UniformSystemInfo(self.handle, self._source_type)
+            print(info.decode('utf-8'))
+
+    def info_of_source(self, idx: int):
+        if self.handle:
+            info = nativemethods.AFC_DLL.AFC_UniformSystemSourceInfo(self.handle, idx, self._source_type)
+            print(info.decode('utf-8'))
 
     def add_wave_source(self, source):
         self.__check_and_init(source)
@@ -402,11 +418,17 @@ class GridAreaBuilder:
 
 class Optimizer():
     @ staticmethod
-    def focus(system: UniformSystem, p: Vector3):
+    def focus(system: UniformSystem, p):
+        if isinstance(p, np.ndarray):
+            p = Vector3(p)
         nativemethods.AFC_DLL.AFO_FocalPoint(system.handle, p, system._source_type)
 
     @ staticmethod
-    def bessel(system: UniformSystem, p: Vector3, direction: Vector3, theta_z: float):
+    def bessel(system: UniformSystem, p, direction, theta_z: float):
+        if isinstance(p, np.ndarray):
+            p = Vector3(p)
+        if isinstance(direction, np.ndarray):
+            direction = Vector3(direction)
         nativemethods.AFC_DLL.AFO_BesselBeam(system.handle, p, direction, c_float(theta_z), system._source_type)
 
     @ staticmethod

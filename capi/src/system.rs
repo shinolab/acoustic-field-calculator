@@ -14,8 +14,9 @@
 use super::type_inference_aux::SourceType;
 use acoustic_field_calculator::prelude::*;
 
-use std::ffi::c_void;
+use std::ffi::{c_void, CString};
 use std::mem::forget;
+use std::os::raw::c_char;
 
 #[no_mangle]
 pub unsafe extern "C" fn AFC_CreateUniformSystem(
@@ -45,12 +46,70 @@ pub unsafe extern "C" fn AFC_FreeUniformSystem(handle: *mut c_void, source_type:
         ($($t:ident ),*) => {
             match SourceType::from_i32(source_type) {
                 $(SourceType::$t => {
-                    let _system: Box<UniformSystem<SphereWaveSource>> = Box::from_raw(handle as *mut _);
+                    let _system: Box<UniformSystem<$t>> = Box::from_raw(handle as *mut _);
                 },)*
             }
         }
     }
     sources!(gen_system);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn AFC_UniformSystemSoundSpeed(handle: *mut c_void, source_type: i32) -> f32 {
+    macro_rules! gen_system {
+        ($($t:ident ),*) => {
+            match SourceType::from_i32(source_type) {
+                $(SourceType::$t => {
+                    let system: Box<UniformSystem<$t>> = Box::from_raw(handle as *mut _);
+                    let sound_speed = system.sound_speed();
+                    forget(system);
+                    sound_speed
+                },)*
+            }
+        }
+    }
+    sources!(gen_system)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn AFC_UniformSystemInfo(
+    handle: *mut c_void,
+    source_type: i32,
+) -> *mut c_char {
+    macro_rules! gen_system {
+        ($($t:ident ),*) => {
+            match SourceType::from_i32(source_type) {
+                $(SourceType::$t => {
+                    let system: Box<UniformSystem<$t>> = Box::from_raw(handle as *mut _);
+                    let info = system.info();
+                    forget(system);
+                    CString::new(info).unwrap().into_raw()
+                },)*
+            }
+        }
+    }
+    sources!(gen_system)
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn AFC_UniformSystemSourceInfo(
+    handle: *mut c_void,
+    source_idx: u64,
+    source_type: i32,
+) -> *mut c_char {
+    macro_rules! gen_system {
+        ($($t:ident ),*) => {
+            match SourceType::from_i32(source_type) {
+                $(SourceType::$t => {
+                    let system: Box<UniformSystem<$t>> = Box::from_raw(handle as *mut _);
+                    let info = system.info_of_source(source_idx as usize);
+                    forget(system);
+                    CString::new(info).unwrap().into_raw()
+                },)*
+            }
+        }
+    }
+    sources!(gen_system)
 }
 
 #[no_mangle]

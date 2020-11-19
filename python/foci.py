@@ -4,7 +4,7 @@ Project: python
 Created Date: 22/09/2020
 Author: Shun Suzuki
 -----
-Last Modified: 16/11/2020
+Last Modified: 19/11/2020
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mpl_toolkits.axes_grid1
 
+from afc import UniformSystem
 from afc import SphereWaveSource, T4010A1  # NOQA
 from afc import CpuCalculator, GpuCalculator, GridAreaBuilder, PressureFieldBuffer, PowerFieldBuffer  # NOQA
 from afc import Optimizer
@@ -43,31 +44,26 @@ if __name__ == '__main__':
     NUM_TRANS_X = 18
     NUM_TRANS_Y = 14
     TRANS_SIZE = 10.18
-
     FREQUENCY = 40e3
-    SOUND_SPEED = 340e3
-    WAVE_LENGTH = SOUND_SPEED / FREQUENCY
+    TEMPERATURE = 300
     Z_DIR = np.array([0, 0, 1])
+
     array_center = np.array([TRANS_SIZE * (NUM_TRANS_X - 1) / 2.0, TRANS_SIZE * (NUM_TRANS_Y - 1) / 2.0, 0])
 
-    # Initialize calculator
-    calculator = CpuCalculator(SOUND_SPEED)
-    # calculator = GpuCalculator(SOUND_SPEED)
+    calculator = CpuCalculator()
 
-    # add wave source
+    system = UniformSystem(TEMPERATURE)
     for y in range(NUM_TRANS_Y):
         for x in range(NUM_TRANS_X):
             pos = np.array([TRANS_SIZE * x, TRANS_SIZE * y, 0.]) - array_center
-            source = SphereWaveSource(pos, 1.0, 0.0, FREQUENCY)
-            calculator.add_wave_source(source)
+            source = T4010A1(pos, Z_DIR, 1.0, 0.0, FREQUENCY)
+            system.add_wave_source(source)
 
     z = 150.0
-    focal_pos = z * Z_DIR
 
-    # Observe properties, units are mm
-    R = 100.0
-    X_RANGE = (- R / 2, R / 2)
-    Y_RANGE = (- R / 2, R / 2)
+    R = 200.0
+    X_RANGE = (-R / 2, R / 2)
+    Y_RANGE = (-R / 2, R / 2)
     RESOLUTION = 1.0
 
     observe_area = GridAreaBuilder()\
@@ -80,7 +76,8 @@ if __name__ == '__main__':
 
     field = PressureFieldBuffer()
 
-    foci = [focal_pos + np.array([20., 0, 0]), focal_pos - np.array([20., 0, 0])]
+    focal_pos = z * Z_DIR
+    foci = [focal_pos + np.array([50., 0, 0]), focal_pos - np.array([50., 0, 0])]
     amps = [1.0, 1.0]
 
     # # SMILE
@@ -99,83 +96,83 @@ if __name__ == '__main__':
 
     # IFFT
     # can only use when 2d phased array and 2d target
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
     path = os.path.join(os.path.dirname(__file__), '../acoustic-field-optimizer/examples/pattern/star.bmp')
     bottom_left = Vector3(np.array([0., 0., 0.]) - array_center)
     top_left = Vector3(np.array([0., TRANS_SIZE * (NUM_TRANS_Y - 1), 0.]) - array_center)
     bottom_right = Vector3(np.array([TRANS_SIZE * (NUM_TRANS_X - 1), 0., 0.]) - array_center)
-    Optimizer.ifft(calculator, path, bottom_left, top_left, bottom_right, TRANS_SIZE, z)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.ifft(system, path, bottom_left, top_left, bottom_right, TRANS_SIZE, z)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'ifft')
 
     # GS-PAT
     # please specify maximum amplitude before
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.gs_pat(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.gs_pat(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'gs-pat')
 
     # Gerchberg-Saxton
     # please specify maximum amplitude before
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.gs(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.gs(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'gs')
 
     # Naive linear synthesis
     # please specify maximum amplitude before
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.naive(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.naive(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'naive')
 
     # Horn
     # please specify maximum amplitude before
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.horn(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.horn(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'horn')
 
     # Long
     # please specify maximum amplitude before
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.long2014(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.long2014(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'long')
 
     # Acoustic Power Optimization (with BFGS)
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.apo(calculator, foci, amps, 2.0)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.apo(system, foci, amps, 2.0)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'apo')
 
     # Levenberg-Marquardt
     # Levenberg-Marquardt optimizer currently does not support amplitudes
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.lm(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.lm(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'lm')
 
     # Gauss-Newton
     # Gauss-Newton optimizer currently does not support amplitudes
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.gauss_newton(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.gauss_newton(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'gauss_newton')
 
     # Gradient-Descent
     # Gradient-Descent optimizer currently does not support amplitudes
-    for source in calculator.get_wave_sources():
+    for source in system.get_wave_sources():
         source.amp = 1.0
-    Optimizer.gradient_descent(calculator, foci, amps)
-    result = calculator.calculate(observe_area, field)
+    Optimizer.gradient_descent(system, foci, amps)
+    result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'gradient_descent')

@@ -112,111 +112,120 @@ def init_dll(dll_location):
 
 def __init_calculator():
     AFC_DLL.AFC_CreateCalculator.argtypes = [POINTER(c_void_p), c_int]
-    AFC_DLL.AFC_CreateCalculator.restypes = [None]
+    AFC_DLL.AFC_CreateCalculator.restype = None
 
     AFC_DLL.AFC_FreeCalculator.argtypes = [c_void_p, c_int]
-    AFC_DLL.AFC_FreeCalculator.restypes = [None]
+    AFC_DLL.AFC_FreeCalculator.restype = None
 
     AFC_DLL.AFC_Calculate.argtypes = [c_void_p, c_void_p, c_void_p, c_void_p, POINTER(c_void_p), c_int, c_int, c_int, c_int]
-    AFC_DLL.AFC_Calculate.restypes = [c_ulong]
+    AFC_DLL.AFC_Calculate.restype = c_ulong
 
 
 def __init_field_buffer():
     AFC_DLL.AFC_CreatePressureField.argtypes = [POINTER(c_void_p)]
-    AFC_DLL.AFC_CreatePressureField.restypes = [None]
+    AFC_DLL.AFC_CreatePressureField.restype = None
 
     AFC_DLL.AFC_FreePressureField.argtypes = [c_void_p]
-    AFC_DLL.AFC_FreePressureField.restypes = [None]
+    AFC_DLL.AFC_FreePressureField.restype = None
 
     AFC_DLL.AFC_CreatePowerField.argtypes = [POINTER(c_void_p)]
-    AFC_DLL.AFC_CreatePowerField.restypes = [None]
+    AFC_DLL.AFC_CreatePowerField.restype = None
 
     AFC_DLL.AFC_FreePowerField.argtypes = [c_void_p]
-    AFC_DLL.AFC_FreePowerField.restypes = [None]
+    AFC_DLL.AFC_FreePowerField.restype = None
 
     AFC_DLL.AFC_CreateComplexPressureField.argtypes = [POINTER(c_void_p)]
-    AFC_DLL.AFC_CreateComplexPressureField.restypes = [None]
+    AFC_DLL.AFC_CreateComplexPressureField.restype = None
 
     AFC_DLL.AFC_FreeComplexPressureField.argtypes = [c_void_p]
-    AFC_DLL.AFC_FreeComplexPressureField.restypes = [None]
+    AFC_DLL.AFC_FreeComplexPressureField.restype = None
 
 
 def __init_observe_area():
     AFC_DLL.AFC_CreateScatterArea.argtypes = [POINTER(c_void_p)]
-    AFC_DLL.AFC_CreateScatterArea.restypes = [None]
+    AFC_DLL.AFC_CreateScatterArea.restype = None
 
     AFC_DLL.AFC_ScatterAddObservePoint.argtypes = [c_void_p, Vector3]
-    AFC_DLL.AFC_ScatterAddObservePoint.restypes = [None]
+    AFC_DLL.AFC_ScatterAddObservePoint.restype = None
 
     AFC_DLL.AFC_FreeScatterArea.argtypes = [c_void_p]
-    AFC_DLL.AFC_FreeScatterArea.restypes = [None]
+    AFC_DLL.AFC_FreeScatterArea.restype = None
 
     AFC_DLL.AFC_CreateGridArea1D.argtypes = [POINTER(c_void_p), c_float, c_float, c_float, c_float, c_float, c_int, c_int, c_int]
-    AFC_DLL.AFC_CreateGridArea1D.restypes = [None]
+    AFC_DLL.AFC_CreateGridArea1D.restype = None
 
     AFC_DLL.AFC_CreateGridArea2D.argtypes = [POINTER(c_void_p), c_float, c_float, c_float, c_float, c_float, c_float, c_int, c_int, c_int]
-    AFC_DLL.AFC_CreateGridArea2D.restypes = [None]
+    AFC_DLL.AFC_CreateGridArea2D.restype = None
 
     AFC_DLL.AFC_CreateGridArea3D.argtypes = [POINTER(c_void_p), c_float, c_float, c_float, c_float, c_float, c_float, c_float, c_int, c_int, c_int]
-    AFC_DLL.AFC_CreateGridArea3D.restypes = [None]
+    AFC_DLL.AFC_CreateGridArea3D.restype = None
 
     AFC_DLL.AFC_FreeGridArea.argtypes = [c_void_p, c_int]
-    AFC_DLL.AFC_FreeGridArea.restypes = [None]
+    AFC_DLL.AFC_FreeGridArea.restype = None
 
     AFC_DLL.AFC_GetGridSize.argtypes = [c_void_p, c_int, POINTER(c_uint), POINTER(c_uint), POINTER(c_uint)]
-    AFC_DLL.AFC_GetGridSize.restypes = [None]
+    AFC_DLL.AFC_GetGridSize.restype = None
 
 
 def __init_optimizer():
     AFC_DLL.AFO_FocalPoint.argtypes = [c_void_p, Vector3, c_int]
-    AFC_DLL.AFO_FocalPoint.restypes = [None]
+    AFC_DLL.AFO_FocalPoint.restype = None
 
     AFC_DLL.AFO_BesselBeam.argtypes = [c_void_p, Vector3, Vector3, c_float, c_int]
-    AFC_DLL.AFO_BesselBeam.restypes = [None]
+    AFC_DLL.AFO_BesselBeam.restype = None
 
     AFC_DLL.AFO_IFFT.argtypes = [c_void_p, c_char_p, Vector3, Vector3, Vector3, c_float, c_float, c_int]
-    AFC_DLL.AFO_IFFT.restypes = [None]
+    AFC_DLL.AFO_IFFT.restype = None
 
     AFC_DLL.AFO_GSPAT.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_GSPAT.restypes = [None]
+    AFC_DLL.AFO_GSPAT.restype = None
 
     AFC_DLL.AFO_GS.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_GS.restypes = [None]
+    AFC_DLL.AFO_GS.restype = None
 
     AFC_DLL.AFO_Naive.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_Naive.restypes = [None]
+    AFC_DLL.AFO_Naive.restype = None
 
     AFC_DLL.AFO_Horn.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_Horn.restypes = [None]
+    AFC_DLL.AFO_Horn.restype = None
 
     AFC_DLL.AFO_Long.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_Long.restypes = [None]
+    AFC_DLL.AFO_Long.restype = None
 
     AFC_DLL.AFO_APO.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_float, c_int]
-    AFC_DLL.AFO_APO.restypes = [None]
+    AFC_DLL.AFO_APO.restype = None
 
     AFC_DLL.AFO_GaussNewton.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_GaussNewton.restypes = [None]
+    AFC_DLL.AFO_GaussNewton.restype = None
 
     AFC_DLL.AFO_LM.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_LM.restypes = [None]
+    AFC_DLL.AFO_LM.restype = None
 
     AFC_DLL.AFO_GradientDescent.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
-    AFC_DLL.AFO_GradientDescent.restypes = [None]
+    AFC_DLL.AFO_GradientDescent.restype = None
 
 
 def __init_system():
     AFC_DLL.AFC_CreateUniformSystem.argtypes = [c_void_p, c_float, c_int]
-    AFC_DLL.AFC_CreateUniformSystem.restypes = [None]
+    AFC_DLL.AFC_CreateUniformSystem.restype = None
 
     AFC_DLL.AFC_FreeUniformSystem.argtypes = [c_void_p, c_int]
-    AFC_DLL.AFC_FreeUniformSystem.restypes = [None]
+    AFC_DLL.AFC_FreeUniformSystem.restype = None
 
     AFC_DLL.AFC_AddSphereWaveSource.argtypes = [c_void_p, SphereWaveSource]
-    AFC_DLL.AFC_AddSphereWaveSource.restypes = [None]
+    AFC_DLL.AFC_AddSphereWaveSource.restype = None
 
     AFC_DLL.AFC_AddT4010A1.argtypes = [c_void_p, T4010A1]
-    AFC_DLL.AFC_AddT4010A1.restypes = [None]
+    AFC_DLL.AFC_AddT4010A1.restype = None
 
     AFC_DLL.AFC_GetWaveSources.argtypes = [c_void_p, POINTER(c_void_p), c_int]
-    AFC_DLL.AFC_GetWaveSources.restypes = [c_ulong]
+    AFC_DLL.AFC_GetWaveSources.restype = c_ulong
+
+    AFC_DLL.AFC_UniformSystemSoundSpeed.argtypes = [c_void_p, c_int]
+    AFC_DLL.AFC_UniformSystemSoundSpeed.restype = c_float
+
+    AFC_DLL.AFC_UniformSystemInfo.argtypes = [c_void_p, c_int]
+    AFC_DLL.AFC_UniformSystemInfo.restype = c_char_p
+
+    AFC_DLL.AFC_UniformSystemSourceInfo.argtypes = [c_void_p, c_ulong, c_int]
+    AFC_DLL.AFC_UniformSystemSourceInfo.restype = c_char_p
