@@ -4,7 +4,7 @@
  * Created Date: 09/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -19,8 +19,14 @@ use acoustic_field_calculator::{
 use std::ffi::c_void;
 use std::mem::forget;
 
+macro_rules! calculators {
+    () => {
+        
+    };
+}
+
 #[no_mangle]
-pub unsafe extern "C" fn AFC_CreateCalculator(out: *mut *mut c_void, c: f32, calc_type: i32) {
+pub unsafe extern "C" fn AFC_CreateCalculator(out: *mut *mut c_void, calc_type: i32) {
     macro_rules! gen_calc {
         ($($t:ident ),*) => {
             match CalculatorType::from_i32(calc_type) {

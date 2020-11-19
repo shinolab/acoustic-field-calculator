@@ -4,14 +4,14 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
  *
  */
 
-use crate::{field_type::FieldType, observe_area::ObserveArea, system::PropagationMedium};
+use crate::{field_buffer::FieldBuffer, observe_area::ObserveArea, system::PropagationMedium};
 
 /// Normal Calculator
 pub struct CpuCalculator {}
@@ -37,15 +37,17 @@ impl CpuCalculator {
     pub fn calculate<
         'a,
         M: PropagationMedium,
+        A: ObserveArea,
         O: Send + Sized + Default + Clone,
-        F: FieldType<Output = O>,
-        A: ObserveArea<F>,
+        F: FieldBuffer<O>,
     >(
         &self,
         medium: &'a M,
-        observe_area: &'a mut A,
+        observe_area: &'a A,
+        buffer: &mut F,
     ) {
-        let (obs_points, results) = observe_area.points_and_results_mut();
+        let obs_points = observe_area.points();
+        let results = buffer.buffer_mut();
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};

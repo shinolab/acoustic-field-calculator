@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -20,7 +20,7 @@ const FREQUENCY: Float = 40e3; // Hz
 const TEMPERATURE: Float = 300.0; // K
 
 macro_rules! write_image {
-    ($filename: tt, $area: ident, $bb: ident) => {{
+    ($filename: tt, $buffer: ident, $bb: ident) => {{
         use image::png::PngEncoder;
         use image::ColorType;
         use scarlet::colormap::ListedColorMap;
@@ -29,9 +29,9 @@ macro_rules! write_image {
         let colormap = ListedColorMap::magma();
 
         let output = File::create($filename).unwrap();
-        let max = $area.max_result() as Float;
-        let pixels: Vec<_> = $area
-            .results()
+        let max = $buffer.max_result() as Float;
+        let pixels: Vec<_> = $buffer
+            .buffer()
             .chunks_exact($bb.0)
             .rev()
             .flatten()
@@ -86,19 +86,18 @@ fn main() {
 
     // Generating observe range and type
     let r = 100.0;
-    let mut area = ObserveAreaBuilder::new()
-        .grid()
+    let area = GridAreaBuilder::new()
         .x_range(array_center[0] - r / 2.0, array_center[0] + r / 2.0)
         .y_range(array_center[1] - r / 2.0, array_center[1] + r / 2.0)
         .z_at(z)
         .resolution(1.)
-        .pressure()
         .generate();
+    let mut buffer = PressureField::new();
 
     // Calculation
     let calculator = Calculator::new();
     let start = std::time::Instant::now();
-    calculator.calculate(&system, &mut area);
+    calculator.calculate(&system, &area, &mut buffer);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
@@ -107,7 +106,7 @@ fn main() {
     // Print to png image
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("xy.png", area, bb);
+    write_image!("xy.png", buffer, bb);
 
     ////////////////////// Moving focus ///////////////////////////////
     let focal_pos = focal_pos + Vector3::new(20., 20., 0.);
@@ -120,7 +119,7 @@ fn main() {
     }
 
     let start = std::time::Instant::now();
-    calculator.calculate(&system, &mut area);
+    calculator.calculate(&system, &area, &mut buffer);
     println!(
         "Elapsed: {} [ms]",
         start.elapsed().as_micros() as f64 / 1000.0
@@ -128,5 +127,5 @@ fn main() {
 
     let bounds = area.bounds();
     let bb = (bounds.x(), bounds.y());
-    write_image!("xy2.png", area, bb);
+    write_image!("xy2.png", buffer, bb);
 }

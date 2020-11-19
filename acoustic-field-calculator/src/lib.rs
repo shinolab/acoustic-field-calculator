@@ -23,7 +23,7 @@ pub mod accurate;
 // gpu modules
 pub mod gpu;
 
-pub mod field_type;
+pub mod field_buffer;
 pub mod fmath;
 pub mod observe_area;
 pub mod prelude;

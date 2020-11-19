@@ -4,7 +4,7 @@
  * Created Date: 17/11/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -24,7 +24,7 @@ pub unsafe extern "C" fn AFC_CreateUniformSystem(
     source_type: i32,
 ) {
     macro_rules! gen_system {
-        ($($t:ident ),*) => {
+        ($($t:ident),*) => {
             match SourceType::from_i32(source_type) {
                 $(SourceType::$t => {
                     let system = UniformSystem::<$t>::new(temperature);

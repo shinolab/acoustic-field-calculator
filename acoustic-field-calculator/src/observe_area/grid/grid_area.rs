@@ -4,7 +4,7 @@
  * Created Date: 05/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -18,32 +18,29 @@ use super::{
 };
 use crate::{
     core::{Float, Vector3},
-    field_type::*,
-    observe_area::traits::*,
+    observe_area::ObserveArea,
 };
 
 use std::marker::PhantomData;
 
 /// Observation points on grid
-pub struct GridArea<D, F: FieldType> {
+pub struct GridArea<D> {
     dimension: Dimension,
     bounds: Bounds,
     observe_points: Vec<Vector3>,
-    results: Vec<F::Output>,
     _dim_num: PhantomData<D>,
 }
 
-impl<D, F: FieldType> GridArea<D, F> {
+impl<D> GridArea<D> {
     fn new_impl<N>(
         dimension: Dimension,
         bounds: Bounds,
         observe_points: Vec<Vector3>,
-    ) -> GridArea<N, F> {
+    ) -> GridArea<N> {
         GridArea {
             dimension,
             bounds,
             observe_points,
-            results: vec![],
             _dim_num: PhantomData,
         }
     }
@@ -59,7 +56,7 @@ impl<D, F: FieldType> GridArea<D, F> {
     }
 }
 
-impl<F: FieldType> GridArea<N1, F> {
+impl GridArea<N1> {
     pub(crate) fn new(axis: Axis, bounds: Bounds, origin: Vector3, resolution: Float) -> Self {
         Self::new_impl(
             Dimension::One(axis),
@@ -91,7 +88,7 @@ impl<F: FieldType> GridArea<N1, F> {
     }
 }
 
-impl<F: FieldType> GridArea<N2, F> {
+impl GridArea<N2> {
     pub(crate) fn new(
         dim: (Axis, Axis),
         bounds: Bounds,
@@ -166,7 +163,7 @@ impl<F: FieldType> GridArea<N2, F> {
     }
 }
 
-impl<F: FieldType> GridArea<N3, F> {
+impl GridArea<N3> {
     pub(crate) fn new(
         dim: (Axis, Axis, Axis),
         bounds: Bounds,
@@ -231,20 +228,8 @@ impl<F: FieldType> GridArea<N3, F> {
     }
 }
 
-impl<D, F: FieldType> ObserveArea<F> for GridArea<D, F> {
-    fn points_and_results_mut(&mut self) -> (&Vec<Vector3>, &mut Vec<F::Output>) {
-        (&self.observe_points, &mut self.results)
-    }
-
-    fn results(&self) -> &[F::Output] {
-        &self.results
-    }
-
+impl<D> ObserveArea for GridArea<D> {
     fn points(&self) -> &[Vector3] {
         &self.observe_points
-    }
-
-    fn results_mut(&mut self) -> &mut Vec<F::Output> {
-        &mut self.results
     }
 }
