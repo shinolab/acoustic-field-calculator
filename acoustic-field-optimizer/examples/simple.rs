@@ -11,6 +11,7 @@
  *
  */
 
+use acoustic_field_calculator::prelude::*;
 use acoustic_field_optimizer::*;
 
 const NUM_TRANS_X: usize = 18;

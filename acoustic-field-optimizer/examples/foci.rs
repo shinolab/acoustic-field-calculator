@@ -11,6 +11,7 @@
  *
  */
 
+use acoustic_field_calculator::prelude::*;
 use acoustic_field_optimizer::multiple_foci::*;
 use acoustic_field_optimizer::*;
 
