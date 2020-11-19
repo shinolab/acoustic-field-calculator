@@ -4,7 +4,7 @@
  * Created Date: 22/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -24,7 +24,7 @@ use acoustic_field_optimizer::multiple_foci::*;
 use acoustic_field_optimizer::*;
 
 macro_rules! gen_match_src_type {
-    ([$( $src_type:ident),*], $st: ident, $handle: ident, $expr: expr) => {
+    ([$($src_type:ident),*], $st: ident, $handle: ident, $expr: expr) => {
         match SourceType::from_i32($st) {
             $(SourceType::$src_type => {
                 let mut system: Box<UniformSystem<$src_type>> = Box::from_raw($handle as *mut _);
@@ -34,7 +34,7 @@ macro_rules! gen_match_src_type {
         }
     };
     ($st: ident, $handle: ident, $expr: expr) => {
-      gen_match_src_type!([SphereWaveSource, T4010A1], $st, $handle, $expr)
+      sources!(gen_match_src_type; $st, $handle, $expr)
     }
 }
 

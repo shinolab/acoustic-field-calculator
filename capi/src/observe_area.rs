@@ -200,7 +200,6 @@ pub unsafe extern "C" fn AFC_GetGridSize(
     first: *mut u32,
     second: *mut u32,
     third: *mut u32,
-    field_type: i32,
 ) {
     let bb = match dimension {
         1 => {

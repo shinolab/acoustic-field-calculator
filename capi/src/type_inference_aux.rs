@@ -11,8 +11,44 @@
  *
  */
 
+use acoustic_field_calculator::observe_area::grid::*;
+
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
+
+pub type GridArea1D = GridArea<N1>;
+pub type GridArea2D = GridArea<N2>;
+pub type GridArea3D = GridArea<N3>;
+
+macro_rules! sources {
+    ($macro: tt; $($tail:tt),+) => {
+        $macro!([SphereWaveSource, T4010A1], $($tail),+)
+    };
+    ($macro: tt) => {
+        $macro!(SphereWaveSource, T4010A1)
+    };
+}
+
+macro_rules! calculators {
+    ($macro: tt; $($tail:tt),+) => {
+        $macro!([CpuCalculator, AccurateCalculator, GpuCalculator], $($tail),+)
+    };
+    ($macro: tt) => {
+        $macro!(CpuCalculator, AccurateCalculator, GpuCalculator)
+    };
+}
+
+macro_rules! obs_areas {
+    ($macro: tt; $($tail:tt),+) => {
+        $macro!([GridArea1D, GridArea2D, GridArea3D, ScatterArea], $($tail),+)
+    };
+}
+
+macro_rules! fields {
+    ($macro: tt; $($tail:tt),+) => {
+        $macro!([PressureField, PowerField, ComplexPressureField], $($tail),+)
+    };
+}
 
 #[derive(FromPrimitive, Copy, Clone)]
 #[repr(i32)]
@@ -45,7 +81,7 @@ pub enum ObserveAreaType {
     GridArea1D = 0,
     GridArea2D = 1,
     GridArea3D = 2,
-    Scatter = 3,
+    ScatterArea = 3,
 }
 impl ObserveAreaType {
     pub fn from_i32(x: i32) -> Self {

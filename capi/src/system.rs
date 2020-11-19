@@ -36,7 +36,7 @@ pub unsafe extern "C" fn AFC_CreateUniformSystem(
             }
         }
     }
-    gen_system!(SphereWaveSource, T4010A1);
+    sources!(gen_system);
 }
 
 #[no_mangle]
@@ -50,7 +50,7 @@ pub unsafe extern "C" fn AFC_FreeUniformSystem(handle: *mut c_void, source_type:
             }
         }
     }
-    gen_system!(SphereWaveSource, T4010A1);
+    sources!(gen_system);
 }
 
 #[no_mangle]
@@ -90,5 +90,5 @@ pub unsafe extern "C" fn AFC_GetWaveSources(
             }
         }
     }
-    match_src_type!(SphereWaveSource, T4010A1)
+    sources!(match_src_type)
 }

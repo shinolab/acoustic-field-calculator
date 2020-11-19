@@ -12,7 +12,7 @@
  */
 
 use super::system_acc::AccPropagationMedium;
-use crate::{field_buffer::FieldBuffer, observe_area::ObserveArea};
+use crate::{core::Vector3, field_buffer::FieldBuffer, observe_area::ObserveArea};
 
 /// Accurate Calculator
 pub struct AccurateCalculator {}
@@ -41,6 +41,19 @@ impl AccurateCalculator {
     ) {
         let obs_points = observe_area.points();
         let results = buffer.buffer_mut();
+        self.calculate_at_points::<_, _, F>(medium, obs_points, results);
+    }
+
+    pub fn calculate_at_points<
+        M: AccPropagationMedium,
+        O: Send + Sized + Default + Clone,
+        F: FieldBuffer<O>,
+    >(
+        &self,
+        medium: &M,
+        obs_points: &[Vector3],
+        results: &mut Vec<O>,
+    ) {
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};
