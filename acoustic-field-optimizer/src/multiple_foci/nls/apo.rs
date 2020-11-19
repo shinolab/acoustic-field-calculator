@@ -4,7 +4,7 @@
  * Created Date: 03/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -18,6 +18,7 @@ const EPS: Float = 1e-8;
 const K_MAX: usize = 200;
 const LINE_SEARCH_MAX: usize = 100;
 
+/// Acoustic Power Optimization
 pub struct APO {
     foci: Vec<Vector3>,
     amps: Vec<Float>,

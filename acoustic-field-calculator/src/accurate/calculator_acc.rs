@@ -12,7 +12,10 @@
  */
 
 use super::system_acc::AccPropagationMedium;
-use crate::{core::Vector3, field_buffer::FieldBuffer, observe_area::ObserveArea};
+use crate::{
+    calculator::FieldCalculator, core::wave_sources::WaveSource, field_buffer::FieldBuffer,
+    observe_area::ObserveArea,
+};
 
 /// Accurate Calculator
 pub struct AccurateCalculator {}
@@ -27,33 +30,19 @@ impl AccurateCalculator {
     pub fn new() -> Self {
         Self {}
     }
+}
 
-    pub fn calculate<
-        M: AccPropagationMedium,
-        A: ObserveArea,
-        O: Send + Sized + Default + Clone,
-        F: FieldBuffer<O>,
-    >(
-        &self,
-        medium: &M,
-        observe_area: &A,
-        buffer: &mut F,
-    ) {
+impl<S, M, A, O, F> FieldCalculator<S, M, A, O, F> for AccurateCalculator
+where
+    S: WaveSource,
+    M: AccPropagationMedium<S>,
+    A: ObserveArea,
+    O: Send + Sized + Default + Clone,
+    F: FieldBuffer<O>,
+{
+    fn calculate(&self, medium: &M, observe_area: &A, buffer: &mut F) {
         let obs_points = observe_area.points();
         let results = buffer.buffer_mut();
-        self.calculate_at_points::<_, _, F>(medium, obs_points, results);
-    }
-
-    pub fn calculate_at_points<
-        M: AccPropagationMedium,
-        O: Send + Sized + Default + Clone,
-        F: FieldBuffer<O>,
-    >(
-        &self,
-        medium: &M,
-        obs_points: &[Vector3],
-        results: &mut Vec<O>,
-    ) {
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};

@@ -4,7 +4,7 @@
  * Created Date: 27/05/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -20,6 +20,7 @@ const REPEAT_SDP: usize = 100;
 const LAMBDA_SDP: Float = 0.8;
 const TIKHONOV_DEFAULT: Float = 1e-5;
 
+/// Inoue et al., 2015
 pub struct Horn {
     foci: Vec<Vector3>,
     amps: Vec<Float>,

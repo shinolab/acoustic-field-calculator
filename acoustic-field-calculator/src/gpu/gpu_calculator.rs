@@ -11,9 +11,7 @@
  *
  */
 
-use crate::{
-    core::wave_sources::WaveSource, gpu::gpu_prelude::*, gpu::*, system::WaveSourceContainer,
-};
+use crate::{calculator::FieldCalculator, core::wave_sources::WaveSource, gpu::gpu_prelude::*, gpu::*};
 
 /// GPU Calculator
 pub struct GpuCalculator {
@@ -31,30 +29,6 @@ impl GpuCalculator {
     pub fn new() -> Self {
         let (device, queue) = Self::init_gpu();
         Self { device, queue }
-    }
-
-    /// Calculate field at observe area
-    ///
-    /// # Arguments
-    ///
-    /// * `observe_area` - Observed area to calculate
-    /// * `field` - Field to calculate
-    ///
-    pub fn calculate<
-        S: WaveSource,
-        M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
-        T,
-        F: GpuFieldBuffer<T>,
-        A: SizedArea,
-    >(
-        &self,
-        medium: &M,
-        observe_area: &A,
-        buffer: &mut F,
-    ) {
-        let device = self.device.clone();
-        let queue = self.queue.clone();
-        F::calculate_field(medium, observe_area, buffer, device, queue);
     }
 
     fn init_gpu() -> (Arc<Device>, Arc<Queue>) {
@@ -78,5 +52,19 @@ impl GpuCalculator {
         let queue = queues.next().unwrap();
 
         (device, queue)
+    }
+}
+
+impl<S, M, A, O, F> FieldCalculator<S, M, A, O, F> for GpuCalculator
+where
+    S: WaveSource,
+    M: GpuPropagationMedium<S>,
+    A: SizedArea,
+    F: GpuFieldBuffer<O>,
+{
+    fn calculate(&self, medium: &M, observe_area: &A, buffer: &mut F) {
+        let device = self.device.clone();
+        let queue = self.queue.clone();
+        F::calculate_field(medium, observe_area, buffer, device, queue);
     }
 }

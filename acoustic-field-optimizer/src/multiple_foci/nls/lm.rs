@@ -4,7 +4,7 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -19,6 +19,7 @@ const EPS_2: Float = 1e-8;
 const TAU: Float = 1e-3;
 const K_MAX: usize = 200;
 
+/// Levenberg-Marquardt
 pub struct LM {
     foci: Vec<Vector3>,
     amps: Vec<Float>,

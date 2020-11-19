@@ -11,16 +11,14 @@
  *
  */
 
-use crate::{
-    core::wave_sources::WaveSource, field_buffer::FieldBuffer, system::WaveSourceContainer,
-};
+use crate::{core::wave_sources::WaveSource, field_buffer::FieldBuffer};
 use crate::{gpu::gpu_prelude::*, gpu::*};
 
 /// Calculate field by gpu calculator
 pub trait GpuFieldBuffer<T>: FieldBuffer<T> {
     fn calculate_field<
         S: WaveSource,
-        M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
+        M: GpuPropagationMedium<S>,
         F: GpuFieldBuffer<T>,
         A: SizedArea,
     >(

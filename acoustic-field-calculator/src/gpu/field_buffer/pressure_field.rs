@@ -17,7 +17,6 @@ use crate::{
     field_buffer::PressureField,
     gpu::gpu_prelude::*,
     gpu::*,
-    system::WaveSourceContainer,
 };
 
 use mut_static::MutStatic;
@@ -46,7 +45,7 @@ struct Config {
 impl GpuFieldBuffer<f32> for PressureField {
     fn calculate_field<
         S: WaveSource,
-        M: GpuPropagationMedium<S> + WaveSourceContainer<S>,
+        M: GpuPropagationMedium<S>,
         F: GpuFieldBuffer<f32>,
         A: SizedArea,
     >(

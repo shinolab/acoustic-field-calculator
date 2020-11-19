@@ -16,7 +16,7 @@ pub use crate::accurate::*;
 #[cfg(feature = "gpu")]
 pub use crate::gpu::*;
 pub use crate::{
-    calculator::CpuCalculator,
+    calculator::*,
     core::{wave_sources::*, Complex, Float, Vector3, PI},
     field_buffer::*,
     observe_area::*,

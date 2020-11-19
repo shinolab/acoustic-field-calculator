@@ -14,7 +14,7 @@
 use super::traits::*;
 use crate::core::Complex;
 
-/// Pressure field
+/// Complex pressure field
 pub struct ComplexPressureField {
     buf: Vec<Complex>,
 }

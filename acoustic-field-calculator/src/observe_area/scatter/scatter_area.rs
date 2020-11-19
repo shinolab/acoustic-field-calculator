@@ -35,6 +35,12 @@ impl ScatterArea {
     }
 }
 
+impl Default for ScatterArea {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ObserveArea for ScatterArea {
     fn points(&self) -> &[Vector3] {
         &self.observe_points

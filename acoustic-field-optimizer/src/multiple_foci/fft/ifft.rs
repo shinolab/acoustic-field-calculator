@@ -4,7 +4,7 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -20,6 +20,7 @@ type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, 
 use image::GenericImageView;
 use rustfft::FFTplanner;
 
+/// Inverse FFT
 pub struct IFFT {
     image_path: String,
     bottom_left: Vector3,

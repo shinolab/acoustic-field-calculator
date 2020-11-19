@@ -4,7 +4,7 @@
  * Created Date: 01/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -16,6 +16,7 @@ use crate::*;
 
 const REPEAT: usize = 100;
 
+/// GS-PAT
 pub struct GSPAT {
     foci: Vec<Vector3>,
     amps: Vec<Float>,

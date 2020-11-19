@@ -4,7 +4,7 @@
  * Created Date: 05/06/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 19/11/2020
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -13,6 +13,8 @@
 
 use crate::*;
 
+/// Producing a bessel beam
+/// * Hasegawa, Keisuke, et al. "Electronically steerable ultrasound-driven long narrow air stream." Applied Physics Letters 111.6 (2017): 064104.
 pub struct BesselBeam {
     point: Vector3,
     dir: Vector3,

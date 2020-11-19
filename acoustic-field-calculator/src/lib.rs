@@ -9,24 +9,25 @@ assert_cfg!(
     "GPU backend cannot be used with double precision float."
 );
 
-#[macro_use]
+/// Calculator
 pub mod calculator;
-#[macro_use]
 mod core;
 
 #[cfg(feature = "accurate")]
-#[macro_use]
-// accurate mode
+/// accurate mode
 pub mod accurate;
 #[cfg(feature = "gpu")]
-#[macro_use]
-// gpu modules
+/// gpu modules
 pub mod gpu;
 
+/// Field buffer defines what kind of field to calculate and contains calculation results.
 pub mod field_buffer;
+/// provide functions of fast math calculation
 pub mod fmath;
+/// Observe area is a set of observing points
 pub mod observe_area;
 pub mod prelude;
+/// System is an environment where wave sources are located. Currently, this library supports only uniform propagation medium.
 pub mod system;
 
 pub use crate::core::wave_sources;

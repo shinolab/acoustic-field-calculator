@@ -2,10 +2,11 @@ extern crate nalgebra as na;
 
 mod bessel;
 mod focal_point;
+/// Producing multiple foci
 pub mod multiple_foci;
 mod traits;
 
-pub use acoustic_field_calculator::prelude::*;
+use acoustic_field_calculator::prelude::*;
 
 pub use bessel::BesselBeam;
 pub use focal_point::FocalPoint;

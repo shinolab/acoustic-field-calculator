@@ -11,8 +11,10 @@
  *
  */
 
+use super::traits::FieldCalculator;
 use crate::{
-    core::Vector3, field_buffer::FieldBuffer, observe_area::ObserveArea, system::PropagationMedium,
+    core::wave_sources::WaveSource, field_buffer::FieldBuffer, observe_area::ObserveArea,
+    system::PropagationMedium,
 };
 
 /// Normal Calculator
@@ -28,40 +30,19 @@ impl CpuCalculator {
     pub fn new() -> Self {
         Self {}
     }
+}
 
-    /// Calculate field at observe area
-    ///
-    /// # Arguments
-    ///
-    /// * `observe_area` - Observed area to calculate
-    /// * `field` - Field to calculate
-    ///
-    pub fn calculate<
-        M: PropagationMedium,
-        A: ObserveArea,
-        O: Send + Sized + Default + Clone,
-        F: FieldBuffer<O>,
-    >(
-        &self,
-        medium: &M,
-        observe_area: &A,
-        buffer: &mut F,
-    ) {
+impl<S, M, A, O, F> FieldCalculator<S, M, A, O, F> for CpuCalculator
+where
+    S: WaveSource,
+    M: PropagationMedium<S>,
+    A: ObserveArea,
+    O: Send + Sized + Default + Clone,
+    F: FieldBuffer<O>,
+{
+    fn calculate(&self, medium: &M, observe_area: &A, buffer: &mut F) {
         let obs_points = observe_area.points();
         let results = buffer.buffer_mut();
-        self.calculate_at_points::<_, _, F>(medium, obs_points, results);
-    }
-
-    pub fn calculate_at_points<
-        M: PropagationMedium,
-        O: Send + Sized + Default + Clone,
-        F: FieldBuffer<O>,
-    >(
-        &self,
-        medium: &M,
-        obs_points: &[Vector3],
-        results: &mut Vec<O>,
-    ) {
         #[cfg(feature = "parallel")]
         {
             use rayon::{iter::IntoParallelRefIterator, prelude::*};

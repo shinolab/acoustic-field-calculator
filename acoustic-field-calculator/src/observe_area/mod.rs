@@ -17,6 +17,6 @@ pub mod grid;
 pub mod scatter;
 mod traits;
 
-pub use grid::GridAreaBuilder;
+pub use grid::{GridArea, GridAreaBuilder};
 pub use scatter::ScatterArea;
 pub use traits::*;
