@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["multiple_foci","Producing multiple foci"]],"struct":[["BesselBeam","Producing a bessel beam * Hasegawa, Keisuke, et al. \"Electronically steerable ultrasound-driven long narrow air stream.\" Applied Physics Letters 111.6 (2017): 064104."],["FocalPoint","Producing a single focal point"]],"trait":[["Optimizer",""]]});
+initSidebarItems({"mod":[["multiple_foci","Producing multiple foci"]],"struct":[["BesselBeam","Producing a bessel beam"],["FocalPoint","Producing a single focal point"]],"trait":[["Optimizer",""]]});
