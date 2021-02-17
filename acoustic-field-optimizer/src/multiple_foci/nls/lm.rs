@@ -4,7 +4,7 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/02/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -63,6 +63,7 @@ impl Optimizer for LM {
         let mut mu = TAU * A_max;
         let mut found = g.max() <= EPS_1;
         let mut Fx = calc_Fx(&BhB, &x, n, m);
+        const ONE: Float = 1.0;
         for _ in 0..K_MAX {
             if found {
                 break;
@@ -89,7 +90,7 @@ impl Optimizer for LM {
                     A = A_new;
                     g = g_new;
                     found = g.max() <= EPS_1;
-                    mu *= (1.0 as Float / 3.).max(1. - (2. * rho - 1.).powf(3.));
+                    mu *= (ONE / 3.).max(1. - (2. * rho - 1.).powf(3.));
                     nu = 2.0;
                 } else {
                     mu *= nu;

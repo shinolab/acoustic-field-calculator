@@ -4,7 +4,7 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 18/02/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -18,7 +18,7 @@ use na::{ComplexField, Dynamic, Matrix, VecStorage};
 type MatrixXcf = Matrix<Complex, Dynamic, Dynamic, VecStorage<Complex, Dynamic, Dynamic>>;
 
 use image::GenericImageView;
-use rustfft::FFTplanner;
+use rustfft::{FftDirection, FftPlanner};
 
 /// Inverse FFT
 pub struct IFFT {
@@ -80,26 +80,17 @@ fn fftshift(array: &MatrixXcf, w: usize, h: usize) -> MatrixXcf {
 }
 
 fn fft2d(array: &mut MatrixXcf, w: usize, h: usize) -> MatrixXcf {
-    let mut tmp = MatrixXcf::zeros(w, h);
-
     for i in 0..h {
-        let mut planner = FFTplanner::new(false);
-        let fft = planner.plan_fft(w);
-        fft.process(
-            &mut array.as_mut_slice()[(i * w)..(i * w + w)],
-            &mut tmp.as_mut_slice()[(i * w)..(i * w + w)],
-        );
+        let mut planner = FftPlanner::new();
+        let fft = planner.plan_fft(w, FftDirection::Forward);
+        fft.process(&mut array.as_mut_slice()[(i * w)..(i * w + w)]);
     }
 
-    let mut tmp = tmp.transpose();
-    let mut result = MatrixXcf::zeros(h, w);
+    let mut result = array.transpose();
     for i in 0..w {
-        let mut planner = FFTplanner::new(false);
-        let fft = planner.plan_fft(h);
-        fft.process(
-            &mut tmp.as_mut_slice()[(i * h)..(i * h + h)],
-            &mut result.as_mut_slice()[(i * h)..(i * h + h)],
-        );
+        let mut planner = FftPlanner::new();
+        let fft = planner.plan_fft(h, FftDirection::Forward);
+        fft.process(&mut result.as_mut_slice()[(i * h)..(i * h + h)]);
     }
 
     result.transpose()
