@@ -168,7 +168,7 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/02/2021
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -185,7 +185,7 @@
 <span class="kw">use</span> <span class="ident">rustfft</span>::{<span class="ident">FftDirection</span>, <span class="ident">FftPlanner</span>};
 
 <span class="doccomment">/// Inverse FFT</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IFFT</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ifft</span> {
     <span class="ident">image_path</span>: <span class="ident">String</span>,
     <span class="ident">bottom_left</span>: <span class="ident">Vector3</span>,
     <span class="ident">top_left</span>: <span class="ident">Vector3</span>,
@@ -194,7 +194,7 @@
     <span class="ident">z</span>: <span class="ident">Float</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">IFFT</span> {
+<span class="kw">impl</span> <span class="ident">Ifft</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">bottom_left</span>: <span class="ident">Vector3</span>,
@@ -260,7 +260,7 @@
     <span class="ident">result</span>.<span class="ident">transpose</span>()
 }
 
-<span class="kw">impl</span> <span class="ident">Optimizer</span> <span class="kw">for</span> <span class="ident">IFFT</span> {
+<span class="kw">impl</span> <span class="ident">Optimizer</span> <span class="kw">for</span> <span class="ident">Ifft</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">many_single_char_names</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
     <span class="kw">fn</span> <span class="ident">optimize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WaveSource</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">system</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UniformSystem</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
