@@ -4,7 +4,7 @@ Project: python
 Created Date: 22/09/2020
 Author: Shun Suzuki
 -----
-Last Modified: 19/11/2020
+Last Modified: 17/06/2021
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -176,3 +176,11 @@ if __name__ == '__main__':
     Optimizer.gradient_descent(system, foci, amps)
     result = calculator.calculate(system, observe_area, field)
     plot(bounds, result, 'gradient_descent')
+
+    # Greedy
+    # Greedy optimizer currently does not support amplitudes
+    for source in system.get_wave_sources():
+        source.amp = 1.0
+    Optimizer.greedy(system, foci, amps, 16)
+    result = calculator.calculate(system, observe_area, field)
+    plot(bounds, result, 'greedy')

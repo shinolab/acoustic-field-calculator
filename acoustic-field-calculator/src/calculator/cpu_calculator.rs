@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -49,7 +49,7 @@ where
             obs_points
                 .par_iter()
                 .map(|&observe_point| {
-                    let cp = medium.propagate(observe_point);
+                    let cp = medium.propagate_all(observe_point);
                     F::calc_from_complex_pressure(cp)
                 })
                 .collect_into_vec(results);
@@ -58,7 +58,7 @@ where
         {
             results.resize(obs_points.len(), Default::default());
             for (result, &observe_point) in results.iter_mut().zip(obs_points) {
-                let cp = medium.propagate(observe_point);
+                let cp = medium.propagate_all(observe_point);
                 *result = F::calc_from_complex_pressure(cp);
             }
         }

@@ -4,7 +4,7 @@ Project: afc
 Created Date: 09/05/2020
 Author: Shun Suzuki
 -----
-Last Modified: 17/02/2021
+Last Modified: 17/06/2021
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -40,7 +40,7 @@ __all__ = [
     'Optimizer',
     'plot_helper']
 
-_Version = '0.6.0'
+_Version = '0.6.1'
 
 PLATFORM = platform.system()
 PREFIX = ''

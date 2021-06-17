@@ -4,7 +4,7 @@
  * Created Date: 18/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -20,6 +20,7 @@ use crate::{
 };
 
 use mut_static::MutStatic;
+use vulkano::command_buffer::CommandBufferUsage;
 
 mod cs_pressure {
     vulkano_shaders::shader! {
@@ -31,6 +32,7 @@ mod cs_pressure {
 gen_cache!(cs_pressure);
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 struct Config {
     source_num: u32,
     num_x: u32,
@@ -220,15 +222,19 @@ impl GpuFieldBuffer<f32> for PressureField {
             .unwrap(),
         );
 
-        let mut builder =
-            AutoCommandBufferBuilder::primary_one_time_submit(device.clone(), queue.family())
-                .unwrap();
+        let mut builder = AutoCommandBufferBuilder::primary(
+            device.clone(),
+            queue.family(),
+            CommandBufferUsage::OneTimeSubmit,
+        )
+        .unwrap();
         builder
             .dispatch(
                 [num_x, num_y, num_z],
                 pipeline,
                 (set_0, set_1, set_2, set_3, set_4),
                 (),
+                vec![],
             )
             .unwrap();
         let command_buffer = builder.build().unwrap();

@@ -4,7 +4,7 @@
  * Created Date: 18/11/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -108,20 +108,21 @@ impl<S: WaveSource> WaveSourceContainer<S> for UniformSystem<S> {
 }
 
 impl<S: WaveSource> PropagationMedium<S> for UniformSystem<S> {
-    fn propagate(&self, target: Vector3) -> Complex {
-        let sources = self.wave_sources();
-        let wavenums = self.wavenums();
-        let attens = self.attens();
+    fn propagate(&self, idx: usize, target: Vector3) -> Complex {
+        let source = &self.wave_sources[idx];
+        let diff = crate::fmath::sub(target, source.position());
+        let dist = diff.norm();
+        let theta = crate::fmath::acos(source.direction().dot(&diff) / dist);
+        let d = S::directivity(theta);
+        let r = source.amp() * d * (-dist * self.attens[idx]).exp() / dist;
+        let phi = source.phase() + self.wavenums[idx] * dist;
+        Complex::from_polar(r, phi)
+    }
+
+    fn propagate_all(&self, target: Vector3) -> Complex {
         let mut c = Complex::zero();
-        for i in 0..sources.len() {
-            let source = &sources[i];
-            let diff = crate::fmath::sub(target, source.position());
-            let dist = diff.norm();
-            let theta = crate::fmath::acos(source.direction().dot(&diff) / dist);
-            let d = S::directivity(theta);
-            let r = source.amp() * d * (-dist * attens[i]).exp() / dist;
-            let phi = source.phase() + wavenums[i] * dist;
-            c += Complex::from_polar(r, phi);
+        for i in 0..self.wave_sources.len() {
+            c += self.propagate(i, target);
         }
         c
     }

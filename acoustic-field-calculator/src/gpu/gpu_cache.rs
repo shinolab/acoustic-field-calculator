@@ -4,7 +4,7 @@
  * Created Date: 20/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 17/02/2021
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -19,7 +19,7 @@ macro_rules! gen_cache {
         struct GpuCache {
             device: Option<GpuDevice>,
             obs_points: (AtomicPtr<Vector3>, usize),
-            pub pipeline: Option<PipeLine<$shader_mod::Layout>>,
+            pub pipeline: Option<PipeLine<$shader_mod::MainLayout>>,
             pub results_buf: Option<GpuBuffer<f32>>,
             pub obs_points_buf: Option<GpuBuffer<[f32; 4]>>,
         }

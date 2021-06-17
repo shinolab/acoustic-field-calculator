@@ -4,7 +4,7 @@
  * Created Date: 21/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -184,7 +184,16 @@ fn main() {
     for source in system.wave_sources_mut() {
         source.set_amp(1.0);
     }
-    APO::new(foci, amps, 2.0).optimize(&mut system);
+    APO::new(foci.clone(), amps.clone(), 2.0).optimize(&mut system);
     calculator.calculate(&system, &area, &mut field);
     write_image_xy!("apo.png", area, field);
+
+    //////////////////////  Greedy  //////////////////////////////
+    // please specify maximum amplitude before
+    for source in system.wave_sources_mut() {
+        source.set_amp(1.0);
+    }
+    Greedy::new(foci, amps, 16).optimize(&mut system);
+    calculator.calculate(&system, &area, &mut field);
+    write_image_xy!("greedy.png", area, field);
 }

@@ -4,7 +4,7 @@
  * Created Date: 22/09/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -221,4 +221,23 @@ pub unsafe extern "C" fn AFO_LM(
     let foci = std::slice::from_raw_parts(foci as *const Vector3, len);
     let amps = std::slice::from_raw_parts(amps, len);
     gen_match_src_type!(source_type, handle, LM::new(foci.to_vec(), amps.to_vec()));
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn AFO_Greedy(
+    handle: *mut c_void,
+    foci: *const c_void,
+    amps: *const f32,
+    size: u64,
+    phase_div: u64,
+    source_type: i32,
+) {
+    let len = size as usize;
+    let foci = std::slice::from_raw_parts(foci as *const Vector3, len);
+    let amps = std::slice::from_raw_parts(amps, len);
+    gen_match_src_type!(
+        source_type,
+        handle,
+        Greedy::new(foci.to_vec(), amps.to_vec(), phase_div as usize)
+    );
 }

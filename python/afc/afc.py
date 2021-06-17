@@ -4,7 +4,7 @@ Project: python
 Created Date: 09/05/2020
 Author: Shun Suzuki
 -----
-Last Modified: 19/11/2020
+Last Modified: 17/06/2021
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -552,3 +552,16 @@ class Optimizer():
             foci_array[3 * i + 2] = focus[2]
         foci_array = np.ctypeslib.as_ctypes(foci_array)
         nativemethods.AFC_DLL.AFO_GradientDescent(system.handle, foci_array, amps, c_ulong(size), system._source_type)
+
+    @ staticmethod
+    def greedy(system: UniformSystem, foci, amps, phase_div:int = 16):
+        size = len(foci)
+        amps = np.array(amps).astype(np.float32)
+        amps = np.ctypeslib.as_ctypes(amps)
+        foci_array = np.zeros([size * 3]).astype(np.float32)
+        for i, focus in enumerate(foci):
+            foci_array[3 * i] = focus[0]
+            foci_array[3 * i + 1] = focus[1]
+            foci_array[3 * i + 2] = focus[2]
+        foci_array = np.ctypeslib.as_ctypes(foci_array)
+        nativemethods.AFC_DLL.AFO_Greedy(system.handle, foci_array, amps, c_ulong(size), c_ulong(phase_div), system._source_type)

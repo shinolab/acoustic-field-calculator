@@ -1,6 +1,6 @@
 [package]
 name = "acoustic-field-optimizer"
-version = "0.6.0"
+version = "0.6.1"
 authors = ["shun suzuki <suzuki@hapis.k.u-tokyo.ac.jp>"]
 edition = "2018"
 
@@ -8,11 +8,11 @@ edition = "2018"
 
 [dependencies]
 acoustic-field-calculator = {path="../acoustic-field-calculator"}
-num = "0.3"
+num = "0.4.0"
 rand = "0.8.3"
-nalgebra = "0.24.1"
+nalgebra = "0.27.1"
 image = "0.23"
-rustfft = "5.0.1"
+rustfft = "6.0.1"
 
 [dev-dependencies]
 scarlet = "1"

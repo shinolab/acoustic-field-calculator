@@ -4,7 +4,7 @@ Project: python
 Created Date: 09/05/2020
 Author: Shun Suzuki
 -----
-Last Modified: 19/11/2020
+Last Modified: 17/06/2021
 Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
 -----
 Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -203,6 +203,9 @@ def __init_optimizer():
 
     AFC_DLL.AFO_GradientDescent.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_int]
     AFC_DLL.AFO_GradientDescent.restype = None
+
+    AFC_DLL.AFO_Greedy.argtypes = [c_void_p, c_void_p, POINTER(c_float), c_ulong, c_ulong, c_int]
+    AFC_DLL.AFO_Greedy.restype = None
 
 
 def __init_system():

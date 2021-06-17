@@ -10,4 +10,4 @@ Please see its [`README`](../acoustic-field-calculator/README.md) before running
 
 # Author
 
-Shun Suzuki, 2020
+Shun Suzuki, 2020-2021

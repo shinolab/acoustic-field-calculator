@@ -26,4 +26,4 @@ This folder contains wrappers for python using capi.
 
 # Author
 
-Shun Suzuki, 2020.
+Shun Suzuki, 2020-2021
