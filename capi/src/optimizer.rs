@@ -72,7 +72,7 @@ pub unsafe extern "C" fn AFO_IFFT(
     gen_match_src_type!(
         source_type,
         handle,
-        IFFT::new(path, bottom_left, top_left, bottom_right, spacing, z)
+        Ifft::new(path, bottom_left, top_left, bottom_right, spacing, z)
     );
 }
 
@@ -90,7 +90,7 @@ pub unsafe extern "C" fn AFO_GSPAT(
     gen_match_src_type!(
         source_type,
         handle,
-        GSPAT::new(foci.to_vec(), amps.to_vec())
+        Gspat::new(foci.to_vec(), amps.to_vec())
     );
 }
 
@@ -169,7 +169,7 @@ pub unsafe extern "C" fn AFO_APO(
     gen_match_src_type!(
         source_type,
         handle,
-        APO::new(foci.to_vec(), amps.to_vec(), lambda)
+        Apo::new(foci.to_vec(), amps.to_vec(), lambda)
     );
 }
 

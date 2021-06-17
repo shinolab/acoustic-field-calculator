@@ -4,7 +4,7 @@
  * Created Date: 02/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/02/2021
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -21,7 +21,7 @@ use image::GenericImageView;
 use rustfft::{FftDirection, FftPlanner};
 
 /// Inverse FFT
-pub struct IFFT {
+pub struct Ifft {
     image_path: String,
     bottom_left: Vector3,
     top_left: Vector3,
@@ -30,7 +30,7 @@ pub struct IFFT {
     z: Float,
 }
 
-impl IFFT {
+impl Ifft {
     pub fn new(
         path: &str,
         bottom_left: Vector3,
@@ -96,7 +96,7 @@ fn fft2d(array: &mut MatrixXcf, w: usize, h: usize) -> MatrixXcf {
     result.transpose()
 }
 
-impl Optimizer for IFFT {
+impl Optimizer for Ifft {
     #[allow(clippy::many_single_char_names)]
     #[allow(non_snake_case)]
     fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {

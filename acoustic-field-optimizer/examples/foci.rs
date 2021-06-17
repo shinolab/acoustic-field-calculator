@@ -99,7 +99,7 @@ fn main() {
             let top_left = Vector3::new(0., TRANS_SIZE * (NUM_TRANS_Y - 1) as Float, 0.);
             let bottom_right = Vector3::new(TRANS_SIZE * (NUM_TRANS_X - 1) as Float, 0., 0.);
 
-            IFFT::new(path, bottom_left, top_left, bottom_right, TRANS_SIZE, z)
+            Ifft::new(path, bottom_left, top_left, bottom_right, TRANS_SIZE, z)
                 .optimize(&mut system);
             calculator.calculate(&system, &area, &mut field);
             write_image_xy!("ifft_star.png", area, field);
@@ -148,7 +148,7 @@ fn main() {
     for source in system.wave_sources_mut() {
         source.set_amp(1.0);
     }
-    GSPAT::new(foci.clone(), amps.clone()).optimize(&mut system);
+    Gspat::new(foci.clone(), amps.clone()).optimize(&mut system);
     calculator.calculate(&system, &area, &mut field);
     write_image_xy!("gs-pat.png", area, field);
 
@@ -184,7 +184,7 @@ fn main() {
     for source in system.wave_sources_mut() {
         source.set_amp(1.0);
     }
-    APO::new(foci.clone(), amps.clone(), 2.0).optimize(&mut system);
+    Apo::new(foci.clone(), amps.clone(), 2.0).optimize(&mut system);
     calculator.calculate(&system, &area, &mut field);
     write_image_xy!("apo.png", area, field);
 

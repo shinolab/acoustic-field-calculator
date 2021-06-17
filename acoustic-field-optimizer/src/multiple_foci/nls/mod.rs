@@ -4,7 +4,7 @@
  * Created Date: 03/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 18/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -17,7 +17,7 @@ mod gradient_descent;
 mod lm;
 mod macros;
 
-pub use apo::APO;
+pub use apo::Apo;
 pub use gauss_newton::GaussNewton;
 pub use gradient_descent::GradientDescent;
 pub use lm::LM;

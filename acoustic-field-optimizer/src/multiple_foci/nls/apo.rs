@@ -4,7 +4,7 @@
  * Created Date: 03/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -19,7 +19,7 @@ const K_MAX: usize = 200;
 const LINE_SEARCH_MAX: usize = 100;
 
 /// Acoustic Power Optimization
-pub struct APO {
+pub struct Apo {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
     lambda: Float,
@@ -27,13 +27,13 @@ pub struct APO {
 
 /// References
 /// * Keisuke Hasegawa, Hiroyuki Shinoda, and Takaaki Nara. Volumetric acoustic holography andits application to self-positioning by single channel measurement.Journal of Applied Physics,127(24):244904, 2020.7
-impl APO {
+impl Apo {
     pub fn new(foci: Vec<Vector3>, amps: Vec<Float>, lambda: Float) -> Self {
         Self { foci, amps, lambda }
     }
 }
 
-impl APO {
+impl Apo {
     #[allow(non_snake_case)]
     fn make_Ri(G: &MatrixXcf, i: usize, m: usize) -> MatrixXcf {
         let mut Di = MatrixXcf::zeros(m, m);
@@ -97,7 +97,7 @@ impl APO {
     }
 }
 
-impl Optimizer for APO {
+impl Optimizer for Apo {
     #[allow(non_snake_case, clippy::many_single_char_names)]
     fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {
         for source in system.wave_sources_mut() {

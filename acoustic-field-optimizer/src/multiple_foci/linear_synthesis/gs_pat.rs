@@ -4,7 +4,7 @@
  * Created Date: 01/10/2020
  * Author: Shun Suzuki
  * -----
- * Last Modified: 19/11/2020
+ * Last Modified: 17/06/2021
  * Modified By: Shun Suzuki (suzuki@hapis.k.u-tokyo.ac.jp)
  * -----
  * Copyright (c) 2020 Hapis Lab. All rights reserved.
@@ -17,7 +17,7 @@ use crate::*;
 const REPEAT: usize = 100;
 
 /// GS-PAT
-pub struct GSPAT {
+pub struct Gspat {
     foci: Vec<Vector3>,
     amps: Vec<Float>,
 }
@@ -26,13 +26,13 @@ pub struct GSPAT {
 /// * Diego Martinez Plasencia et al. "Gs-pat: high-speed multi-point sound-fields for phased arrays of transducers," ACMTrans-actions on Graphics (TOG), 39(4):138–1, 2020.
 ///
 /// Not yet been implemented with GPU.
-impl GSPAT {
+impl Gspat {
     pub fn new(foci: Vec<Vector3>, amps: Vec<Float>) -> Self {
         Self { foci, amps }
     }
 }
 
-impl Optimizer for GSPAT {
+impl Optimizer for Gspat {
     #[allow(non_snake_case)]
     #[allow(clippy::many_single_char_names)]
     fn optimize<S: WaveSource>(&self, system: &mut UniformSystem<S>) {
