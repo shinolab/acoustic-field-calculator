@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["acoustic_field_calculator","acoustic_field_optimizer","afccapi"];

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["AFO_APO",""],["AFO_BesselBeam",""],["AFO_FocalPoint",""],["AFO_GS",""],["AFO_GSPAT",""],["AFO_GaussNewton",""],["AFO_GradientDescent",""],["AFO_Horn",""],["AFO_IFFT",""],["AFO_LM",""],["AFO_Long",""],["AFO_Naive",""]]});
+initSidebarItems({"fn":[["AFO_APO",""],["AFO_BesselBeam",""],["AFO_FocalPoint",""],["AFO_GS",""],["AFO_GSPAT",""],["AFO_GaussNewton",""],["AFO_GradientDescent",""],["AFO_Greedy",""],["AFO_Horn",""],["AFO_IFFT",""],["AFO_LM",""],["AFO_Long",""],["AFO_Naive",""]]});
